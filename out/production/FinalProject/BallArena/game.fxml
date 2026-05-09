@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.canvas.Canvas?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="BallArena.ui.GameController"
+            prefWidth="800" prefHeight="600">
+    <center>
+        <Canvas fx:id="gameCanvas" width="700" height="500"/>
+    </center>
+</BorderPane>
