@@ -10,29 +10,19 @@ public class WallSpike implements Ability {
     /** 尖刺資料（純資料，不含 JavaFX） */
     public static class Spike {
         public double x, y;
-        public double timeLeft; // 剩餘存活秒數
 
-        public Spike(double x, double y, double duration) {
+        public Spike(double x, double y) {
             this.x        = x;
             this.y        = y;
-            this.timeLeft = duration;
         }
     }
 
     private final List<Spike> spikes = new ArrayList<>();
 
-    /** 每根尖刺的存活時間（秒） */
-    private static final double SPIKE_DURATION = 5.0;
 
     @Override
     public void update(double deltaTime) {
-        // 每幀倒數所有尖刺的存活時間，移除過期的
-        Iterator<Spike> it = spikes.iterator();
-        while (it.hasNext()) {
-            Spike s = it.next();
-            s.timeLeft -= deltaTime;
-            if (s.timeLeft <= 0) it.remove();
-        }
+        // spike lasts forever until game ends
     }
 
     @Override
@@ -42,7 +32,11 @@ public class WallSpike implements Ability {
 
     /** 在指定座標新增一根尖刺 */
     public void addSpike(double x, double y) {
-        spikes.add(new Spike(x, y, SPIKE_DURATION));
+        spikes.add(new Spike(x, y));
+    }
+
+    public void clearSpikes() {
+        spikes.clear();
     }
 
     public List<Spike> getSpikes() { return spikes; }

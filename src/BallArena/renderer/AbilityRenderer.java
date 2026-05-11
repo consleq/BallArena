@@ -20,15 +20,21 @@ public class AbilityRenderer {
     }
 
     private void renderSword(GraphicsContext gc, RotatingSword sword) {
+        gc.save();
+
         gc.setStroke(Color.SILVER);
         gc.setLineWidth(4);
         gc.strokeLine(
                 sword.getSwordStartX(), sword.getSwordStartY(),
                 sword.getSwordEndX(),   sword.getSwordEndY()
         );
+
+        gc.restore();
     }
 
     private void renderSpikes(GraphicsContext gc, WallSpike wallSpike) {
+        gc.save();
+
         gc.setFill(Color.ORANGERED);
         for (WallSpike.Spike spike : wallSpike.getSpikes()) {
             // 簡單畫一個小三角形代表尖刺
@@ -40,5 +46,7 @@ public class AbilityRenderer {
                     3
             );
         }
+
+        gc.restore();
     }
 }
