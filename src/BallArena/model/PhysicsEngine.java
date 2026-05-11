@@ -8,6 +8,16 @@ public class PhysicsEngine {
      * @param ball      要更新的球
      * @param deltaTime 經過的秒數
      */
+
+    // 傷害常數
+    private static final double SWORD_DAMAGE = 5.0;
+    private static final double SPIKE_DAMAGE = 3.0;
+
+    // 避免連續扣血的冷卻時間（秒）
+    private double swordCooldown = 0;
+    private double spikeCooldown = 0;
+    private static final double HIT_COOLDOWN = 0.5;
+
     public void update(Ball ball, double deltaTime) {
         // 移動
         ball.setX(ball.getX() + ball.getVx() * deltaTime);
@@ -49,6 +59,81 @@ public class PhysicsEngine {
                 spikeBall.addSpike(ball.getX(), ball.getY());
             }
         }
+    }
+
+    /** 更新冷卻計時器，每幀呼叫 */
+    public void updateCooldowns(double deltaTime) {
+        swordCooldown = Math.max(0, swordCooldown - deltaTime);
+        spikeCooldown = Math.max(0, spikeCooldown - deltaTime);
+    }
+
+    /**
+     * 檢查 SwordBall 的劍是否擊中目標球
+     * 使用「點到線段的最短距離」判斷
+     */
+    public void checkSwordHit(SwordBall attacker, Ball target) {
+        if (swordCooldown > 0) return;
+
+        var sword = attacker.getSword();
+
+        // 劍的起點與終點
+        double ax = sword.getSwordStartX(), ay = sword.getSwordStartY();
+        double bx = sword.getSwordEndX(),   by = sword.getSwordEndY();
+
+        // 目標球心
+        double cx = target.getX(), cy = target.getY();
+
+        double dist = pointToSegmentDistance(cx, cy, ax, ay, bx, by);
+
+        if (dist < target.getRadius()) {
+            target.takeDamage(SWORD_DAMAGE);
+            swordCooldown = HIT_COOLDOWN; // 重置冷卻，避免同一幀連續扣血
+        }
+    }
+
+    /**
+     * 檢查 SpikeBall 的所有尖刺是否碰到目標球
+     */
+    public void checkSpikeHit(SpikeBall attacker, Ball target) {
+        if (spikeCooldown > 0) return;
+
+        for (var spike : attacker.getWallSpike().getSpikes()) {
+            double dx = spike.x - target.getX();
+            double dy = spike.y - target.getY();
+            double dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < target.getRadius()) {
+                target.takeDamage(SPIKE_DAMAGE);
+                spikeCooldown = HIT_COOLDOWN;
+                break; // 同一幀只扣一次血
+            }
+        }
+    }
+
+    /**
+     * 計算點 (px, py) 到線段 (ax,ay)-(bx,by) 的最短距離
+     */
+    private double pointToSegmentDistance(
+            double px, double py,
+            double ax, double ay,
+            double bx, double by) {
+
+        double dx = bx - ax, dy = by - ay;
+        double lenSq = dx * dx + dy * dy;
+
+        if (lenSq == 0) {
+            // 線段退化成點
+            return Math.sqrt((px - ax) * (px - ax) + (py - ay) * (py - ay));
+        }
+
+        // 投影比例 t，夾在 [0, 1] 表示在線段上
+        double t = Math.max(0, Math.min(1,
+                ((px - ax) * dx + (py - ay) * dy) / lenSq));
+
+        double nearX = ax + t * dx;
+        double nearY = ay + t * dy;
+
+        return Math.sqrt((px - nearX) * (px - nearX) + (py - nearY) * (py - nearY));
     }
 
     /**

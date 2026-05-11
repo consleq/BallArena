@@ -63,6 +63,15 @@ public class GameController {
         physics.handleBallCollision(ball1, ball2);
         ball1.updateAbility(deltaTime);
         ball2.updateAbility(deltaTime);
+
+        // 冷卻計時器更新
+        physics.updateCooldowns(deltaTime);
+
+        // 扣血偵測（SwordBall 打 SpikeBall，SpikeBall 打 SwordBall）
+        if (ball1 instanceof SwordBall sb1) physics.checkSwordHit(sb1, ball2);
+        if (ball2 instanceof SwordBall sb2) physics.checkSwordHit(sb2, ball1);
+        if (ball1 instanceof SpikeBall spb1) physics.checkSpikeHit(spb1, ball2);
+        if (ball2 instanceof SpikeBall spb2) physics.checkSpikeHit(spb2, ball1);
     }
 
     private void render() {
