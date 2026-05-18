@@ -3,35 +3,30 @@ package BallArena.model;
 /** 所有球種的抽象基底類別（不依賴 JavaFX） */
 public abstract class Ball {
 
-    // 位置
     protected double x;
     protected double y;
-
-    // 速度（每幀移動量）
     protected double vx;
     protected double vy;
-
-    // 血量
     protected double hp;
     protected double maxHp;
-
-    // 球的半徑（從 ArenaConfig 讀取）
     protected final double radius = ArenaConfig.BALL_RADIUS;
 
-    public Ball(double x, double y, double hp) {
+    /** 球的視覺風格（由子類別決定） */
+    protected final BallStyle style;
+
+    public Ball(double x, double y, double hp, BallStyle style) {
         this.x     = x;
         this.y     = y;
         this.hp    = hp;
         this.maxHp = hp;
+        this.style = style;
     }
 
-    /** 子類別必須實作：每幀更新技能邏輯 */
     public abstract void updateAbility(double deltaTime);
-
-    /** 子類別必須實作：碰到牆壁時觸發 */
     public abstract void onBounce(boolean hitVertical, boolean hitHorizontal);
 
-    // ── Getters / Setters ──────────────────────────────────────────────
+    /** 子類別必須提供球種的中文名稱（顯示在結算畫面） */
+    public abstract String getTypeName();
 
     public double getX()      { return x; }
     public double getY()      { return y; }
@@ -40,6 +35,7 @@ public abstract class Ball {
     public double getHp()     { return hp; }
     public double getMaxHp()  { return maxHp; }
     public double getRadius() { return radius; }
+    public BallStyle getStyle() { return style; }
 
     public void setX(double x)   { this.x = x; }
     public void setY(double y)   { this.y = y; }

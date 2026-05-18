@@ -10,8 +10,9 @@ import javafx.scene.text.TextAlignment;
 public class HudRenderer {
 
     public void render(GraphicsContext gc, Ball ball1, Ball ball2) {
-        drawHpAboveBall(gc, ball1, Color.CORNFLOWERBLUE);
-        drawHpAboveBall(gc, ball2, Color.TOMATO);
+        // 顏色從球的 style 取得，不再寫死
+        drawHpAboveBall(gc, ball1, BallColorMap.colorOf(ball1.getStyle()));
+        drawHpAboveBall(gc, ball2, BallColorMap.colorOf(ball2.getStyle()));
     }
 
     private void drawHpAboveBall(GraphicsContext gc, Ball ball, Color color) {
@@ -22,11 +23,9 @@ public class HudRenderer {
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 13));
         gc.setTextAlign(TextAlignment.CENTER);
 
-        // 陰影
         gc.setFill(Color.color(0, 0, 0, 0.6));
         gc.fillText(text, x + 1, y + 1);
 
-        // 文字本體
         gc.setFill(Color.WHITE);
         gc.fillText(text, x, y);
     }

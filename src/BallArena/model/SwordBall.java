@@ -7,8 +7,8 @@ public class SwordBall extends Ball {
 
     private final RotatingSword sword;
 
-    public SwordBall(double x, double y) {
-        super(x, y, 100);
+    public SwordBall(double x, double y, BallStyle style) {
+        super(x, y, 100, style);
         this.sword = new RotatingSword(this);
     }
 
@@ -21,6 +21,9 @@ public class SwordBall extends Ball {
     public void onBounce(boolean hitVertical, boolean hitHorizontal) {
         sword.onBounce();
     }
+
+    @Override
+    public String getTypeName() { return "劍球"; }
 
     public RotatingSword getSword() { return sword; }
 }

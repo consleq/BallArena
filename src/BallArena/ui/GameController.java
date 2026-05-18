@@ -2,10 +2,16 @@ package BallArena.ui;
 
 import BallArena.model.*;
 import BallArena.renderer.ArenaRenderer;
+import BallArena.renderer.BallColorMap;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 import java.util.Random;
 
@@ -19,19 +25,19 @@ public class GameController {
     private ArenaRenderer renderer;
     private AnimationTimer gameLoop;
     private long lastTime = -1;
+    private boolean gameEnded = false;
 
     @FXML
     public void initialize() {
         physics  = new PhysicsEngine();
         renderer = new ArenaRenderer();
 
-        // 暫時寫死球種（之後從 Menu 傳入）
-        ball1 = new SwordBall(200, 250);
-        ball2 = new SpikeBall(500, 250);
+        // 建球時直接指定陣營顏色
+        ball1 = new SwordBall(200, 250, BallStyle.BLUE);
+        ball2 = new SpikeBall(500, 250, BallStyle.RED);
 
-        // 給兩球隨機初速
         Random rng = new Random();
-        double speed = 180; // px/秒
+        double speed = 180;
         double angle1 = rng.nextDouble() * Math.PI * 2;
         double angle2 = rng.nextDouble() * Math.PI * 2;
         ball1.setVx(Math.cos(angle1) * speed);
@@ -39,15 +45,12 @@ public class GameController {
         ball2.setVx(Math.cos(angle2) * speed);
         ball2.setVy(Math.sin(angle2) * speed);
 
-        // 啟動遊戲主迴圈
         gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 if (lastTime < 0) { lastTime = now; return; }
                 double deltaTime = (now - lastTime) / 1_000_000_000.0;
                 lastTime = now;
-
-                // 上限 deltaTime，避免視窗拖移造成大跳躍
                 deltaTime = Math.min(deltaTime, 0.05);
 
                 update(deltaTime);
@@ -58,20 +61,53 @@ public class GameController {
     }
 
     private void update(double deltaTime) {
+        if (gameEnded) return;
+
         physics.update(ball1, deltaTime);
         physics.update(ball2, deltaTime);
         physics.handleBallCollision(ball1, ball2);
         ball1.updateAbility(deltaTime);
         ball2.updateAbility(deltaTime);
 
-        // 冷卻計時器更新
         physics.updateCooldowns(deltaTime);
 
-        // 扣血偵測（SwordBall 打 SpikeBall，SpikeBall 打 SwordBall）
         if (ball1 instanceof SwordBall sb1) physics.checkSwordHit(sb1, ball2);
         if (ball2 instanceof SwordBall sb2) physics.checkSwordHit(sb2, ball1);
         if (ball1 instanceof SpikeBall spb1) physics.checkSpikeHit(spb1, ball2);
         if (ball2 instanceof SpikeBall spb2) physics.checkSpikeHit(spb2, ball1);
+
+        checkGameOver();
+    }
+
+    private void checkGameOver() {
+        if (ball1.isDead() && ball2.isDead()) {
+            endGame("平手", Color.GRAY);
+        } else if (ball1.isDead()) {
+            // 直接用球的內建資訊，不用再寫 if/else 判斷型別
+            endGame(ball2.getTypeName(), BallColorMap.colorOf(ball2.getStyle()));
+        } else if (ball2.isDead()) {
+            endGame(ball1.getTypeName(), BallColorMap.colorOf(ball1.getStyle()));
+        }
+    }
+
+    private void endGame(String winnerName, Color color) {
+        gameEnded = true;
+        gameLoop.stop();
+
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/BallArena/result.fxml")
+            );
+            Parent root = loader.load();
+
+            ResultController resultController = loader.getController();
+            resultController.setWinner(winnerName, color);
+
+            Stage stage = (Stage) gameCanvas.getScene().getWindow();
+            stage.setScene(new Scene(root, 800, 600));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void render() {
