@@ -33,20 +33,18 @@ public class AbilityRenderer {
     }
 
     private void renderSpikes(GraphicsContext gc, WallSpike wallSpike) {
-        gc.save();
-
         gc.setFill(Color.ORANGERED);
         for (WallSpike.Spike spike : wallSpike.getSpikes()) {
-            // 簡單畫一個小三角形代表尖刺
-            double x = spike.x;
-            double y = spike.y;
+            gc.save();
+            gc.translate(spike.x, spike.y);
+            gc.rotate(spike.angle);
+            // 基底在原點(貼牆)、尖端往上(-SPIKE_LENGTH)；旋轉後尖端指向場地內側
             gc.fillPolygon(
-                    new double[]{x, x - 6, x + 6},
-                    new double[]{y - 10, y + 4, y + 4},
+                    new double[]{0, -6, 6},
+                    new double[]{-WallSpike.SPIKE_LENGTH, 0, 0},
                     3
             );
+            gc.restore();
         }
-
-        gc.restore();
     }
 }

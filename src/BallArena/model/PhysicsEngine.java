@@ -54,9 +54,24 @@ public class PhysicsEngine {
         if (hitV || hitH) {
             ball.onBounce(hitV, hitH);
 
-            // 若是 SpikeBall，在碰撞點產生尖刺
+            // 若是 SpikeBall，把尖刺基底貼在牆面上，並依牆面決定方向
+            // 角度定義：0=朝上(下牆), 90=朝右(左牆), 180=朝下(上牆), 270=朝左(右牆)
             if (ball instanceof SpikeBall spikeBall) {
-                spikeBall.addSpike(ball.getX(), ball.getY());
+                double angle, sx, sy;
+                if (hitV) {
+                    if (ball.getX() < ArenaConfig.WIDTH / 2.0) {
+                        angle = 90;  sx = 0;                   sy = ball.getY();
+                    } else {
+                        angle = 270; sx = ArenaConfig.WIDTH;   sy = ball.getY();
+                    }
+                } else {
+                    if (ball.getY() < ArenaConfig.HEIGHT / 2.0) {
+                        angle = 180; sx = ball.getX();         sy = 0;
+                    } else {
+                        angle = 0;   sx = ball.getX();         sy = ArenaConfig.HEIGHT;
+                    }
+                }
+                spikeBall.addSpike(sx, sy, angle);
             }
         }
     }
@@ -92,20 +107,42 @@ public class PhysicsEngine {
     }
 
     /**
-     * 檢查 SpikeBall 的所有尖刺是否碰到目標球
+     * 檢查 SpikeBall 的尖刺尖端是否碰到目標球
+     * 碰到時：彈開目標球，並（在冷卻外時）扣血
      */
     public void checkSpikeHit(SpikeBall attacker, Ball target) {
-        if (spikeCooldown > 0) return;
-
         for (var spike : attacker.getWallSpike().getSpikes()) {
-            double dx = spike.x - target.getX();
-            double dy = spike.y - target.getY();
+            double tipX = spike.getTipX();
+            double tipY = spike.getTipY();
+
+            // 尖端到目標球心的向量
+            double dx = target.getX() - tipX;
+            double dy = target.getY() - tipY;
             double dist = Math.sqrt(dx * dx + dy * dy);
 
-            if (dist < target.getRadius()) {
-                target.takeDamage(SPIKE_DAMAGE);
-                spikeCooldown = HIT_COOLDOWN;
-                break; // 同一幀只扣一次血
+            if (dist < target.getRadius() && dist > 0) {
+                // 法線：從尖端指向目標球心
+                double nx = dx / dist;
+                double ny = dy / dist;
+
+                // 推出重疊，避免球卡在尖端上
+                double overlap = target.getRadius() - dist;
+                target.setX(target.getX() + nx * overlap);
+                target.setY(target.getY() + ny * overlap);
+
+                // 只在球朝尖端方向移動時才反射（避免剛被彈開又被吸回）
+                double vDotN = target.getVx() * nx + target.getVy() * ny;
+                if (vDotN < 0) {
+                    target.setVx(target.getVx() - 2 * vDotN * nx);
+                    target.setVy(target.getVy() - 2 * vDotN * ny);
+                }
+
+                // 冷卻內仍會反彈，但不重複扣血
+                if (spikeCooldown <= 0) {
+                    target.takeDamage(SPIKE_DAMAGE);
+                    spikeCooldown = HIT_COOLDOWN;
+                }
+                break; // 一幀只處理一次碰撞
             }
         }
     }

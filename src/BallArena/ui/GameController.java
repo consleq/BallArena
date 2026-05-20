@@ -31,10 +31,16 @@ public class GameController {
     public void initialize() {
         physics  = new PhysicsEngine();
         renderer = new ArenaRenderer();
+        // 球與遊戲迴圈會在 setBallTypes() 被呼叫後才建立
+    }
 
-        // 建球時直接指定陣營顏色
-        ball1 = new SwordBall(200, 250, BallStyle.BLUE);
-        ball2 = new SpikeBall(500, 250, BallStyle.RED);
+    /**
+     * 由 SelectController 在切換場景時呼叫，指定雙方球種並啟動遊戲
+     * 玩家球(藍)在左、敵方球(紅)在右
+     */
+    public void setBallTypes(BallType playerType, BallType enemyType) {
+        ball1 = createBall(playerType, 80,  150, BallStyle.BLUE);
+        ball2 = createBall(enemyType,  220, 150, BallStyle.RED);
 
         Random rng = new Random();
         double speed = 180;
@@ -60,6 +66,14 @@ public class GameController {
         gameLoop.start();
     }
 
+    /** 依照 BallType 建立對應的 Ball 子類別；新增球種時須在此加 case */
+    private Ball createBall(BallType type, double x, double y, BallStyle style) {
+        return switch (type) {
+            case SWORD -> new SwordBall(x, y, style);
+            case SPIKE -> new SpikeBall(x, y, style);
+        };
+    }
+
     private void update(double deltaTime) {
         if (gameEnded) return;
 
@@ -83,10 +97,9 @@ public class GameController {
         if (ball1.isDead() && ball2.isDead()) {
             endGame("平手", Color.GRAY);
         } else if (ball1.isDead()) {
-            // 直接用球的內建資訊，不用再寫 if/else 判斷型別
-            endGame(ball2.getTypeName(), BallColorMap.colorOf(ball2.getStyle()));
+            endGame("敵方（" + ball2.getTypeName() + "）", BallColorMap.colorOf(ball2.getStyle()));
         } else if (ball2.isDead()) {
-            endGame(ball1.getTypeName(), BallColorMap.colorOf(ball1.getStyle()));
+            endGame("玩家（" + ball1.getTypeName() + "）", BallColorMap.colorOf(ball1.getStyle()));
         }
     }
 

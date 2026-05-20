@@ -25,8 +25,8 @@ public class SpikeBall extends Ball {
     @Override
     public String getTypeName() { return "尖刺球"; }
 
-    public void addSpike(double x, double y) {
-        wallSpike.addSpike(x, y);
+    public void addSpike(double x, double y, double angle) {
+        wallSpike.addSpike(x, y, angle);
     }
 
     public WallSpike getWallSpike() { return wallSpike; }

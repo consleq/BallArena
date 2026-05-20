@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="BallArena.ui.SelectController"
+      alignment="CENTER" spacing="32"
+      prefWidth="800" prefHeight="600"
+      style="-fx-background-color: #0f0f1a;">
+    <padding><Insets top="40" bottom="40" left="40" right="40"/></padding>
+
+    <Label text="選擇你的球種"
+           style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+    <Label text="選好之後，對手會從所有球種中隨機選一個"
+           style="-fx-font-size: 14px; -fx-text-fill: #aaaaaa;"/>
+
+    <HBox alignment="CENTER" spacing="40">
+
+        <!-- 劍球卡片 -->
+        <VBox alignment="CENTER" spacing="14" prefWidth="260"
+              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 28;">
+            <Label text="劍球"
+                   style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: silver;"/>
+            <Label text="一把劍以固定角速度繞球旋轉"
+                   wrapText="true"
+                   style="-fx-font-size: 13px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
+            <Label text="命中傷害：5"
+                   style="-fx-font-size: 12px; -fx-text-fill: #888888;"/>
+            <Button fx:id="swordButton" text="選擇劍球" onAction="#onSelectSword"
+                    prefWidth="180" prefHeight="42"
+                    style="-fx-font-size: 16px;"/>
+        </VBox>
+
+        <!-- 尖刺球卡片 -->
+        <VBox alignment="CENTER" spacing="14" prefWidth="260"
+              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 28;">
+            <Label text="尖刺球"
+                   style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: orangered;"/>
+            <Label text="每次碰牆會在牆面生成尖刺，敵方撞到尖端會被反彈"
+                   wrapText="true"
+                   style="-fx-font-size: 13px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
+            <Label text="命中傷害：3"
+                   style="-fx-font-size: 12px; -fx-text-fill: #888888;"/>
+            <Button fx:id="spikeButton" text="選擇尖刺球" onAction="#onSelectSpike"
+                    prefWidth="180" prefHeight="42"
+                    style="-fx-font-size: 16px;"/>
+        </VBox>
+
+    </HBox>
+
+    <Button fx:id="backButton" text="返回主選單" onAction="#onBackToMenu"
+            prefWidth="140" prefHeight="36"
+            style="-fx-font-size: 13px;"/>
+</VBox>

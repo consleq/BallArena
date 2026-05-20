@@ -13,9 +13,9 @@ public class MenuController {
 
     @FXML
     private void onStartGame() throws Exception {
-        // 切換到遊戲畫面
+        // 切換到選球畫面
         FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/BallArena/game.fxml")
+                getClass().getResource("/BallArena/select.fxml")
         );
         Parent root = loader.load();
         Stage stage = (Stage) startButton.getScene().getWindow();
