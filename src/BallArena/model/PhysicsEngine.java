@@ -1,5 +1,7 @@
 package BallArena.model;
 
+import BallArena.ability.FireSpell;
+
 /** 負責移動、牆壁反彈、球與球碰撞（純 Java，不依賴 JavaFX） */
 public class PhysicsEngine {
 
@@ -17,6 +19,11 @@ public class PhysicsEngine {
     private double swordCooldown = 0;
     private double spikeCooldown = 0;
     private static final double HIT_COOLDOWN = 0.5;
+
+    // 火球範圍傷害：每幀少量扣血、每秒結算一次 popup 顯示
+    private static final double FIRE_POPUP_INTERVAL = 1.0;
+    private double firePopupTimer       = 0;
+    private double fireAccumulatedDmg   = 0;
 
     public void update(Ball ball, double deltaTime) {
         // 移動
@@ -80,6 +87,7 @@ public class PhysicsEngine {
     public void updateCooldowns(double deltaTime) {
         swordCooldown = Math.max(0, swordCooldown - deltaTime);
         spikeCooldown = Math.max(0, spikeCooldown - deltaTime);
+        firePopupTimer += deltaTime;
     }
 
     /**
@@ -149,6 +157,35 @@ public class PhysicsEngine {
                 }
                 break; // 一幀只處理一次碰撞
             }
+        }
+        return 0;
+    }
+
+    /**
+     * 計算 FireBall 的所有 zone 對目標造成的連續傷害
+     * 每幀少量扣血，每滿 1 秒回傳該秒內累計的傷害量供 popup 顯示
+     * @return 達到 1 秒結算時的累計傷害量（其餘時間回傳 0）
+     */
+    public double checkFireZoneDamage(FireBall attacker, Ball target, double deltaTime) {
+        double frameDmg = 0;
+        for (var zone : attacker.getFireSpell().getZones()) {
+            double dx = target.getX() - zone.x;
+            double dy = target.getY() - zone.y;
+            double hit = FireSpell.FireZone.RADIUS + target.getRadius();
+            if (dx * dx + dy * dy < hit * hit) {
+                double dmg = FireSpell.FireZone.DAMAGE_PER_SEC * deltaTime;
+                target.takeDamage(dmg);
+                frameDmg = dmg;
+                break; // 多個 zone 重疊只算一次
+            }
+        }
+        fireAccumulatedDmg += frameDmg;
+
+        if (firePopupTimer >= FIRE_POPUP_INTERVAL) {
+            double popupDmg = fireAccumulatedDmg;
+            firePopupTimer    = 0;
+            fireAccumulatedDmg = 0;
+            return popupDmg; // 若該秒內無傷害則為 0
         }
         return 0;
     }

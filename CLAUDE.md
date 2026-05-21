@@ -51,16 +51,18 @@ src/
     ├── model/                    ← 純 Java，不依賴 JavaFX
     │   ├── GameState.java        ← 遊戲階段 enum：MENU / SELECT / PLAYING / RESULT
     │   ├── BallStyle.java        ← 球色 enum：BLUE("藍球") / RED("紅球")
-    │   ├── BallType.java         ← 球種 enum：SWORD / SPIKE（無實例下指定建立哪種球）
+    │   ├── BallType.java         ← 球種 enum：SWORD / SPIKE / FIRE（無實例下指定建立哪種球）
     │   ├── Ball.java             ← 抽象基底類別（位置、速度、HP、BallStyle）
     │   ├── SwordBall.java
     │   ├── SpikeBall.java
+    │   ├── FireBall.java
     │   ├── PhysicsEngine.java    ← 移動、反彈、球與球碰撞、傷害計算
     │   └── ArenaConfig.java      ← 場地常數：WIDTH=300, HEIGHT=300, BALL_RADIUS=20
     ├── ability/                  ← Strategy 模式，每個技能獨立
     │   ├── Ability.java          ← 介面：update(deltaTime), onBounce()
     │   ├── RotatingSword.java
-    │   └── WallSpike.java
+    │   ├── WallSpike.java
+    │   └── FireSpell.java
     └── renderer/                 ← 只負責繪製，不含邏輯
         ├── ArenaRenderer.java    ← 繪製總協調者
         ├── BallRenderer.java
@@ -93,6 +95,7 @@ resources/
 4. `ui/GameController.createBall()` — 加上對應的 switch case
 5. `resources/BallArena/select.fxml` + `ui/SelectController.java` — 新增該球種的選擇卡片與按鈕
 6. `renderer/AbilityRenderer.java` — 在 `render()` 加上對應型別的繪製邏輯
+7. 若新球種需要知道對手（如 FireBall），在 `GameController.setBallTypes()` 建好雙方球之後 instanceof 檢查並呼叫對應的 setter（如 `setTarget`）
 
 ## 現有球種
 
@@ -106,13 +109,19 @@ resources/
 - 行為：每次碰牆在碰撞點產生尖刺，尖刺目前永久存在直到遊戲結束
 - 尖刺座標由 `PhysicsEngine` 碰牆後呼叫 `spikeBall.addSpike(x, y)` 傳入
 
+### FireBall（`model/FireBall.java`）
+- 技能：`FireSpell`（`ability/FireSpell.java`）
+- 行為：每 1.8 秒自動鎖定敵方位置發射火球（220 px/s）；火球碰到目標或牆壁時產生半徑 32 的圓形範圍傷害區，持續 3 秒、每秒對範圍內目標扣 4 HP
+- **需要 target 參考**：`GameController.setBallTypes()` 建好球後須呼叫 `fireBall.setTarget(對手球)`，否則不會發射
+- 連續傷害每秒結算一次 popup，避免每幀洗版
+
 ## 物理引擎重點（`PhysicsEngine.java`）
 
 - 球與牆壁：完全彈性反彈，碰牆後呼叫 `ball.onBounce(hitVertical, hitHorizontal)`
 - 球與球：質量相等的彈性碰撞，交換法線方向速度分量
 - deltaTime 上限 0.05 秒，避免視窗拖移造成大跳躍
 - 碰牆後若是 `SpikeBall`，由 PhysicsEngine 負責呼叫 `addSpike()`
-- **傷害系統**：劍碰撞 5 HP／次，尖刺碰撞 3 HP／次，同一對球 0.5 秒冷卻；兩球 HP 均為 100，歸零即判負
+- **傷害系統**：劍碰撞 5 HP／次，尖刺碰撞 3 HP／次，同一對球 0.5 秒冷卻；火球範圍傷害 4 HP／秒（連續扣）；兩球 HP 均為 100，歸零即判負
 
 ## 遊戲流程
 

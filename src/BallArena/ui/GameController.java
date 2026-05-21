@@ -45,6 +45,10 @@ public class GameController {
         ball1 = createBall(playerType, 80,  150, BallStyle.BLUE);
         ball2 = createBall(enemyType,  220, 150, BallStyle.RED);
 
+        // 需要鎖定對手的球種（如火球）在雙方建立完成後設定 target
+        if (ball1 instanceof FireBall fb1) fb1.setTarget(ball2);
+        if (ball2 instanceof FireBall fb2) fb2.setTarget(ball1);
+
         Random rng = new Random();
         double speed = 180;
         double angle1 = rng.nextDouble() * Math.PI * 2;
@@ -74,6 +78,7 @@ public class GameController {
         return switch (type) {
             case SWORD -> new SwordBall(x, y, style);
             case SPIKE -> new SpikeBall(x, y, style);
+            case FIRE  -> new FireBall(x, y, style);
         };
     }
 
@@ -105,6 +110,15 @@ public class GameController {
         if (ball2 instanceof SpikeBall spb2) {
             double dmg = physics.checkSpikeHit(spb2, ball1);
             if (dmg > 0) popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
+        }
+        // 火球範圍傷害每秒結算一次 popup，平常仍每幀少量扣血
+        if (ball1 instanceof FireBall fb1) {
+            double dmg = physics.checkFireZoneDamage(fb1, ball2, deltaTime);
+            if (dmg >= 1.0) popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
+        }
+        if (ball2 instanceof FireBall fb2) {
+            double dmg = physics.checkFireZoneDamage(fb2, ball1, deltaTime);
+            if (dmg >= 1.0) popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
         }
 
         checkGameOver();

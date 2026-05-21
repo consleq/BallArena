@@ -1,7 +1,9 @@
 package BallArena.renderer;
 
+import BallArena.ability.FireSpell;
 import BallArena.ability.WallSpike;
 import BallArena.model.Ball;
+import BallArena.model.FireBall;
 import BallArena.model.SpikeBall;
 import BallArena.model.SwordBall;
 import BallArena.ability.RotatingSword;
@@ -16,6 +18,8 @@ public class AbilityRenderer {
             renderSword(gc, sb.getSword());
         } else if (ball instanceof SpikeBall spb) {
             renderSpikes(gc, spb.getWallSpike());
+        } else if (ball instanceof FireBall fb) {
+            renderFireSpell(gc, fb.getFireSpell());
         }
     }
 
@@ -30,6 +34,33 @@ public class AbilityRenderer {
         );
 
         gc.restore();
+    }
+
+    private void renderFireSpell(GraphicsContext gc, FireSpell fireSpell) {
+        // 先畫範圍傷害區（在下層）
+        for (FireSpell.FireZone zone : fireSpell.getZones()) {
+            double alpha = zone.getProgress();
+            double r = FireSpell.FireZone.RADIUS;
+
+            // 半透明火紅填充
+            gc.setFill(Color.color(1.0, 0.35, 0.05, 0.28 * alpha));
+            gc.fillOval(zone.x - r, zone.y - r, r * 2, r * 2);
+
+            // 較深的邊框
+            gc.setStroke(Color.color(1.0, 0.45, 0.0, 0.85 * alpha));
+            gc.setLineWidth(2);
+            gc.strokeOval(zone.x - r, zone.y - r, r * 2, r * 2);
+        }
+
+        // 再畫飛行中的投射物（在上層）
+        for (FireSpell.FireProjectile p : fireSpell.getProjectiles()) {
+            double r = FireSpell.FireProjectile.RADIUS;
+            gc.setFill(Color.ORANGERED);
+            gc.fillOval(p.x - r, p.y - r, r * 2, r * 2);
+            gc.setStroke(Color.YELLOW);
+            gc.setLineWidth(1);
+            gc.strokeOval(p.x - r, p.y - r, r * 2, r * 2);
+        }
     }
 
     private void renderSpikes(GraphicsContext gc, WallSpike wallSpike) {

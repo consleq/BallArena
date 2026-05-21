@@ -18,35 +18,50 @@
     <Label text="選好之後，對手會從所有球種中隨機選一個"
            style="-fx-font-size: 14px; -fx-text-fill: #aaaaaa;"/>
 
-    <HBox alignment="CENTER" spacing="40">
+    <HBox alignment="CENTER" spacing="20">
 
         <!-- 劍球卡片 -->
-        <VBox alignment="CENTER" spacing="14" prefWidth="260"
-              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 28;">
+        <VBox alignment="CENTER" spacing="12" prefWidth="220"
+              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 22;">
             <Label text="劍球"
-                   style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: silver;"/>
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: silver;"/>
             <Label text="一把劍以固定角速度繞球旋轉"
                    wrapText="true"
-                   style="-fx-font-size: 13px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
+                   style="-fx-font-size: 12px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
             <Label text="命中傷害：5"
-                   style="-fx-font-size: 12px; -fx-text-fill: #888888;"/>
+                   style="-fx-font-size: 11px; -fx-text-fill: #888888;"/>
             <Button fx:id="swordButton" text="選擇劍球" onAction="#onSelectSword"
-                    prefWidth="180" prefHeight="42"
+                    prefWidth="160" prefHeight="40"
                     styleClass="menu-button"/>
         </VBox>
 
         <!-- 尖刺球卡片 -->
-        <VBox alignment="CENTER" spacing="14" prefWidth="260"
-              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 28;">
+        <VBox alignment="CENTER" spacing="12" prefWidth="220"
+              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 22;">
             <Label text="尖刺球"
-                   style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: orangered;"/>
-            <Label text="每次碰牆會在牆面生成尖刺，敵方撞到尖端會被反彈"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: orangered;"/>
+            <Label text="每次碰牆生成尖刺，敵方撞到尖端會被反彈"
                    wrapText="true"
-                   style="-fx-font-size: 13px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
+                   style="-fx-font-size: 12px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
             <Label text="命中傷害：3"
-                   style="-fx-font-size: 12px; -fx-text-fill: #888888;"/>
+                   style="-fx-font-size: 11px; -fx-text-fill: #888888;"/>
             <Button fx:id="spikeButton" text="選擇尖刺球" onAction="#onSelectSpike"
-                    prefWidth="180" prefHeight="42"
+                    prefWidth="160" prefHeight="40"
+                    styleClass="menu-button"/>
+        </VBox>
+
+        <!-- 火球卡片 -->
+        <VBox alignment="CENTER" spacing="12" prefWidth="220"
+              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 22;">
+            <Label text="火球"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;"/>
+            <Label text="鎖定敵方位置發射火球，命中產生範圍傷害區"
+                   wrapText="true"
+                   style="-fx-font-size: 12px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
+            <Label text="持續 3 秒，每秒 4 點傷害"
+                   style="-fx-font-size: 11px; -fx-text-fill: #888888;"/>
+            <Button fx:id="fireButton" text="選擇火球" onAction="#onSelectFire"
+                    prefWidth="160" prefHeight="40"
                     styleClass="menu-button"/>
         </VBox>
 
