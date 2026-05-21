@@ -85,9 +85,10 @@ public class PhysicsEngine {
     /**
      * 檢查 SwordBall 的劍是否擊中目標球
      * 使用「點到線段的最短距離」判斷
+     * @return 實際造成的傷害量（未命中或冷卻中為 0）
      */
-    public void checkSwordHit(SwordBall attacker, Ball target) {
-        if (swordCooldown > 0) return;
+    public double checkSwordHit(SwordBall attacker, Ball target) {
+        if (swordCooldown > 0) return 0;
 
         var sword = attacker.getSword();
 
@@ -102,15 +103,18 @@ public class PhysicsEngine {
 
         if (dist < target.getRadius()) {
             target.takeDamage(SWORD_DAMAGE);
-            swordCooldown = HIT_COOLDOWN; // 重置冷卻，避免同一幀連續扣血
+            swordCooldown = HIT_COOLDOWN;
+            return SWORD_DAMAGE;
         }
+        return 0;
     }
 
     /**
      * 檢查 SpikeBall 的尖刺尖端是否碰到目標球
      * 碰到時：彈開目標球，並（在冷卻外時）扣血
+     * @return 實際造成的傷害量（未命中或冷卻中為 0）
      */
-    public void checkSpikeHit(SpikeBall attacker, Ball target) {
+    public double checkSpikeHit(SpikeBall attacker, Ball target) {
         for (var spike : attacker.getWallSpike().getSpikes()) {
             double tipX = spike.getTipX();
             double tipY = spike.getTipY();
@@ -141,10 +145,12 @@ public class PhysicsEngine {
                 if (spikeCooldown <= 0) {
                     target.takeDamage(SPIKE_DAMAGE);
                     spikeCooldown = HIT_COOLDOWN;
+                    return SPIKE_DAMAGE;
                 }
                 break; // 一幀只處理一次碰撞
             }
         }
+        return 0;
     }
 
     /**

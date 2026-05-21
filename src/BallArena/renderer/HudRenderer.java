@@ -4,10 +4,19 @@ import BallArena.model.Ball;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 
+import java.io.InputStream;
+
 public class HudRenderer {
+
+    private final Font pressStartFont;
+
+    public HudRenderer() {
+        InputStream stream = HudRenderer.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf");
+        Font loaded = (stream != null) ? Font.loadFont(stream, 10) : null;
+        pressStartFont = (loaded != null) ? loaded : Font.font("Arial", 13);
+    }
 
     public void render(GraphicsContext gc, Ball ball1, Ball ball2) {
         // 顏色從球的 style 取得，不再寫死
@@ -20,7 +29,7 @@ public class HudRenderer {
         double x = ball.getX();
         double y = ball.getY() - ball.getRadius() - 8;
 
-        gc.setFont(Font.font("Arial", FontWeight.BOLD, 13));
+        gc.setFont(pressStartFont);
         gc.setTextAlign(TextAlignment.CENTER);
 
         gc.setFill(Color.color(0, 0, 0, 0.6));

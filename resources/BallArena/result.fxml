@@ -6,6 +6,7 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="BallArena.ui.ResultController"
+      stylesheets="@styles.css"
       alignment="CENTER" spacing="30"
       prefWidth="800" prefHeight="600"
       style="-fx-background-color: #0f0f1a;">
@@ -19,5 +20,5 @@
 
     <Button fx:id="backButton" text="回主選單" onAction="#onBackToMenu"
             prefWidth="200" prefHeight="50"
-            style="-fx-font-size: 18px;"/>
+            styleClass="menu-button"/>
 </VBox>

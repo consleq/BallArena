@@ -7,6 +7,7 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="BallArena.ui.SelectController"
+      stylesheets="@styles.css"
       alignment="CENTER" spacing="32"
       prefWidth="800" prefHeight="600"
       style="-fx-background-color: #0f0f1a;">
@@ -31,7 +32,7 @@
                    style="-fx-font-size: 12px; -fx-text-fill: #888888;"/>
             <Button fx:id="swordButton" text="選擇劍球" onAction="#onSelectSword"
                     prefWidth="180" prefHeight="42"
-                    style="-fx-font-size: 16px;"/>
+                    styleClass="menu-button"/>
         </VBox>
 
         <!-- 尖刺球卡片 -->
@@ -46,12 +47,12 @@
                    style="-fx-font-size: 12px; -fx-text-fill: #888888;"/>
             <Button fx:id="spikeButton" text="選擇尖刺球" onAction="#onSelectSpike"
                     prefWidth="180" prefHeight="42"
-                    style="-fx-font-size: 16px;"/>
+                    styleClass="menu-button"/>
         </VBox>
 
     </HBox>
 
     <Button fx:id="backButton" text="返回主選單" onAction="#onBackToMenu"
             prefWidth="140" prefHeight="36"
-            style="-fx-font-size: 13px;"/>
+            styleClass="back-button"/>
 </VBox>

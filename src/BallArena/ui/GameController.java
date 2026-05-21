@@ -3,6 +3,7 @@ package BallArena.ui;
 import BallArena.model.*;
 import BallArena.renderer.ArenaRenderer;
 import BallArena.renderer.BallColorMap;
+import BallArena.renderer.PopupRenderer;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -23,14 +24,16 @@ public class GameController {
     private Ball ball2;
     private PhysicsEngine physics;
     private ArenaRenderer renderer;
+    private PopupRenderer popupRenderer;
     private AnimationTimer gameLoop;
     private long lastTime = -1;
     private boolean gameEnded = false;
 
     @FXML
     public void initialize() {
-        physics  = new PhysicsEngine();
-        renderer = new ArenaRenderer();
+        physics       = new PhysicsEngine();
+        renderer      = new ArenaRenderer();
+        popupRenderer = new PopupRenderer();
         // 球與遊戲迴圈會在 setBallTypes() 被呼叫後才建立
     }
 
@@ -84,11 +87,25 @@ public class GameController {
         ball2.updateAbility(deltaTime);
 
         physics.updateCooldowns(deltaTime);
+        popupRenderer.update(deltaTime);
 
-        if (ball1 instanceof SwordBall sb1) physics.checkSwordHit(sb1, ball2);
-        if (ball2 instanceof SwordBall sb2) physics.checkSwordHit(sb2, ball1);
-        if (ball1 instanceof SpikeBall spb1) physics.checkSpikeHit(spb1, ball2);
-        if (ball2 instanceof SpikeBall spb2) physics.checkSpikeHit(spb2, ball1);
+        // 判定命中；若造成傷害則在被攻擊球上方顯示扣血 popup
+        if (ball1 instanceof SwordBall sb1) {
+            double dmg = physics.checkSwordHit(sb1, ball2);
+            if (dmg > 0) popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
+        }
+        if (ball2 instanceof SwordBall sb2) {
+            double dmg = physics.checkSwordHit(sb2, ball1);
+            if (dmg > 0) popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
+        }
+        if (ball1 instanceof SpikeBall spb1) {
+            double dmg = physics.checkSpikeHit(spb1, ball2);
+            if (dmg > 0) popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
+        }
+        if (ball2 instanceof SpikeBall spb2) {
+            double dmg = physics.checkSpikeHit(spb2, ball1);
+            if (dmg > 0) popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
+        }
 
         checkGameOver();
     }
@@ -126,5 +143,6 @@ public class GameController {
     private void render() {
         GraphicsContext gc = gameCanvas.getGraphicsContext2D();
         renderer.render(gc, ball1, ball2);
+        popupRenderer.render(gc);
     }
 }

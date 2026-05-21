@@ -6,13 +6,17 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="BallArena.ui.MenuController"
+      stylesheets="@styles.css"
       alignment="CENTER" spacing="20"
-      prefWidth="800" prefHeight="600">
+      prefWidth="800" prefHeight="600"
+      style="-fx-background-color: #0f0f1a;">
     <padding><Insets top="40" bottom="40" left="40" right="40"/></padding>
 
-    <Label text="Ball Arena" style="-fx-font-size: 48px; -fx-font-weight: bold;"/>
-    <Label text="選擇你的球種後開始對戰！" style="-fx-font-size: 16px;"/>
+    <Label text="Ball Arena"
+           style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+    <Label text="選擇你的球種後開始對戰！"
+           style="-fx-font-size: 16px; -fx-text-fill: #aaaaaa;"/>
     <Button fx:id="startButton" text="開始遊戲" onAction="#onStartGame"
             prefWidth="200" prefHeight="50"
-            style="-fx-font-size: 18px;"/>
+            styleClass="menu-button"/>
 </VBox>
