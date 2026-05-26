@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -28,12 +29,19 @@ public class GameController {
     private AnimationTimer gameLoop;
     private long lastTime = -1;
     private boolean gameEnded = false;
+    private AudioClip bounceSound;
 
     @FXML
     public void initialize() {
         physics       = new PhysicsEngine();
         renderer      = new ArenaRenderer();
         popupRenderer = new PopupRenderer();
+
+        var url = getClass().getResource("/soundfx/Bounce.mp3");
+        if (url != null) {
+            bounceSound = new AudioClip(url.toExternalForm());
+            bounceSound.setVolume(0.5);
+        }
         // 球與遊戲迴圈會在 setBallTypes() 被呼叫後才建立
     }
 
@@ -85,8 +93,9 @@ public class GameController {
     private void update(double deltaTime) {
         if (gameEnded) return;
 
-        physics.update(ball1, deltaTime);
-        physics.update(ball2, deltaTime);
+        boolean b1Bounce = physics.update(ball1, deltaTime);
+        boolean b2Bounce = physics.update(ball2, deltaTime);
+        if ((b1Bounce || b2Bounce) && bounceSound != null) bounceSound.play();
         physics.handleBallCollision(ball1, ball2);
         ball1.updateAbility(deltaTime);
         ball2.updateAbility(deltaTime);
@@ -111,14 +120,16 @@ public class GameController {
             double dmg = physics.checkSpikeHit(spb2, ball1);
             if (dmg > 0) popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
         }
-        // 火球範圍傷害每秒結算一次 popup，平常仍每幀少量扣血
+        // 火球：扣血由 FireSpell 自己處理，這裡只取走事件顯示 popup
         if (ball1 instanceof FireBall fb1) {
-            double dmg = physics.checkFireZoneDamage(fb1, ball2, deltaTime);
-            if (dmg >= 1.0) popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
+            for (Double dmg : fb1.getFireSpell().drainDamageHits()) {
+                popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
+            }
         }
         if (ball2 instanceof FireBall fb2) {
-            double dmg = physics.checkFireZoneDamage(fb2, ball1, deltaTime);
-            if (dmg >= 1.0) popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
+            for (Double dmg : fb2.getFireSpell().drainDamageHits()) {
+                popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
+            }
         }
 
         checkGameOver();

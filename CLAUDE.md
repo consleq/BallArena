@@ -111,9 +111,10 @@ resources/
 
 ### FireBall（`model/FireBall.java`）
 - 技能：`FireSpell`（`ability/FireSpell.java`）
-- 行為：每 1.8 秒自動鎖定敵方位置發射火球（220 px/s）；火球碰到目標或牆壁時產生半徑 32 的圓形範圍傷害區，持續 3 秒、每秒對範圍內目標扣 4 HP
+- 行為：每 1.8 秒自動鎖定敵方位置發射火球（300 px/s）；火球直接命中目標 → 扣 4 HP；火球碰到牆壁 → 在落點產生一次性爆炸（半徑 32），目標若在範圍內也扣 4 HP
+- 爆炸不持續傷害，僅留下 0.5 秒視覺特效
 - **需要 target 參考**：`GameController.setBallTypes()` 建好球後須呼叫 `fireBall.setTarget(對手球)`，否則不會發射
-- 連續傷害每秒結算一次 popup，避免每幀洗版
+- 扣血由 `FireSpell` 自行呼叫 `target.takeDamage()`，並透過 `drainDamageHits()` 暴露 popup 事件給 `GameController`
 
 ## 物理引擎重點（`PhysicsEngine.java`）
 
@@ -121,7 +122,7 @@ resources/
 - 球與球：質量相等的彈性碰撞，交換法線方向速度分量
 - deltaTime 上限 0.05 秒，避免視窗拖移造成大跳躍
 - 碰牆後若是 `SpikeBall`，由 PhysicsEngine 負責呼叫 `addSpike()`
-- **傷害系統**：劍碰撞 5 HP／次，尖刺碰撞 3 HP／次，同一對球 0.5 秒冷卻；火球範圍傷害 4 HP／秒（連續扣）；兩球 HP 均為 100，歸零即判負
+- **傷害系統**：劍碰撞 5 HP／次，尖刺碰撞 3 HP／次，同一對球 0.5 秒冷卻；火球爆炸 4 HP／次（直接命中或牆壁爆炸範圍內）；兩球 HP 均為 100，歸零即判負
 
 ## 遊戲流程
 
