@@ -30,6 +30,7 @@ public class GameController {
     private long lastTime = -1;
     private boolean gameEnded = false;
     private AudioClip bounceSound;
+    private AudioClip spikeHitSound;
 
     @FXML
     public void initialize() {
@@ -41,6 +42,11 @@ public class GameController {
         if (url != null) {
             bounceSound = new AudioClip(url.toExternalForm());
             bounceSound.setVolume(0.5);
+        }
+        var spikeUrl = getClass().getResource("/soundfx/SpikeHit.mp3");
+        if (spikeUrl != null) {
+            spikeHitSound = new AudioClip(spikeUrl.toExternalForm());
+            spikeHitSound.setVolume(0.7);
         }
         // 球與遊戲迴圈會在 setBallTypes() 被呼叫後才建立
     }
@@ -114,11 +120,17 @@ public class GameController {
         }
         if (ball1 instanceof SpikeBall spb1) {
             double dmg = physics.checkSpikeHit(spb1, ball2);
-            if (dmg > 0) popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
+            if (dmg > 0) {
+                popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
+                if (spikeHitSound != null) spikeHitSound.play();
+            }
         }
         if (ball2 instanceof SpikeBall spb2) {
             double dmg = physics.checkSpikeHit(spb2, ball1);
-            if (dmg > 0) popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
+            if (dmg > 0) {
+                popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
+                if (spikeHitSound != null) spikeHitSound.play();
+            }
         }
         // 火球：扣血由 FireSpell 自己處理，這裡只取走事件顯示 popup
         if (ball1 instanceof FireBall fb1) {
