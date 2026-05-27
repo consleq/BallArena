@@ -31,7 +31,7 @@ public class PhysicsEngine {
     private double turretPopupTimer     = 0;
     private double turretAccumulatedDmg = 0;
 
-    public void update(Ball ball, double deltaTime) {
+    public boolean update(Ball ball, double deltaTime) {
         // 移動
         ball.setX(ball.getX() + ball.getVx() * deltaTime);
         ball.setY(ball.getY() + ball.getVy() * deltaTime);
@@ -87,6 +87,7 @@ public class PhysicsEngine {
                 spikeBall.addSpike(sx, sy, angle);
             }
         }
+        return hitV || hitH;
     }
 
     /** 更新冷卻計時器，每幀呼叫 */
@@ -164,35 +165,6 @@ public class PhysicsEngine {
                 }
                 break; // 一幀只處理一次碰撞
             }
-        }
-        return 0;
-    }
-
-    /**
-     * 計算 FireBall 的所有 zone 對目標造成的連續傷害
-     * 每幀少量扣血，每滿 1 秒回傳該秒內累計的傷害量供 popup 顯示
-     * @return 達到 1 秒結算時的累計傷害量（其餘時間回傳 0）
-     */
-    public double checkFireZoneDamage(FireBall attacker, Ball target, double deltaTime) {
-        double frameDmg = 0;
-        for (var zone : attacker.getFireSpell().getZones()) {
-            double dx = target.getX() - zone.x;
-            double dy = target.getY() - zone.y;
-            double hit = FireSpell.FireZone.RADIUS + target.getRadius();
-            if (dx * dx + dy * dy < hit * hit) {
-                double dmg = FireSpell.FireZone.DAMAGE_PER_SEC * deltaTime;
-                target.takeDamage(dmg);
-                frameDmg = dmg;
-                break; // 多個 zone 重疊只算一次
-            }
-        }
-        fireAccumulatedDmg += frameDmg;
-
-        if (firePopupTimer >= FIRE_POPUP_INTERVAL) {
-            double popupDmg = fireAccumulatedDmg;
-            firePopupTimer    = 0;
-            fireAccumulatedDmg = 0;
-            return popupDmg; // 若該秒內無傷害則為 0
         }
         return 0;
     }

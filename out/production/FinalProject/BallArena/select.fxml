@@ -58,10 +58,10 @@
               style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 22;">
             <Label text="火球"
                    style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;"/>
-            <Label text="鎖定敵方位置發射火球，命中產生範圍傷害區"
+            <Label text="鎖定敵方位置發射火球，命中或牆壁爆炸造成範圍傷害"
                    wrapText="true"
                    style="-fx-font-size: 12px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
-            <Label text="持續 3 秒，每秒 4 點傷害"
+            <Label text="一次性傷害：4"
                    style="-fx-font-size: 11px; -fx-text-fill: #888888;"/>
             <Button fx:id="fireButton" text="選擇火球" onAction="#onSelectFire"
                     prefWidth="160" prefHeight="40"

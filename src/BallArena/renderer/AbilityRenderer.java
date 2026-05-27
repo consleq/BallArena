@@ -19,7 +19,7 @@ public class AbilityRenderer {
         if (ball instanceof SwordBall sb) {
             renderSword(gc, sb.getSword());
         } else if (ball instanceof SpikeBall spb) {
-            renderSpikes(gc, spb.getWallSpike());
+            renderSpikes(gc, spb.getWallSpike(), BallColorMap.colorOf(spb.getStyle()));
         } else if (ball instanceof FireBall fb) {
             renderFireSpell(gc, fb.getFireSpell());
         } else if (ball instanceof EngineerBall eb) {
@@ -67,8 +67,8 @@ public class AbilityRenderer {
         }
     }
 
-    private void renderSpikes(GraphicsContext gc, WallSpike wallSpike) {
-        gc.setFill(Color.ORANGERED);
+    private void renderSpikes(GraphicsContext gc, WallSpike wallSpike, Color color) {
+        gc.setFill(color);
         for (WallSpike.Spike spike : wallSpike.getSpikes()) {
             gc.save();
             gc.translate(spike.x, spike.y);
