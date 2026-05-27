@@ -1,5 +1,7 @@
 package BallArena.renderer;
 
+import BallArena.ability.TurretSkill;
+import BallArena.model.EngineerBall;
 import BallArena.ability.FireSpell;
 import BallArena.ability.WallSpike;
 import BallArena.model.Ball;
@@ -20,6 +22,8 @@ public class AbilityRenderer {
             renderSpikes(gc, spb.getWallSpike());
         } else if (ball instanceof FireBall fb) {
             renderFireSpell(gc, fb.getFireSpell());
+        } else if (ball instanceof EngineerBall eb) {
+            renderTurret(gc, eb.getTurretSkill());
         }
     }
 
@@ -77,5 +81,52 @@ public class AbilityRenderer {
             );
             gc.restore();
         }
+    }
+    /** 繪製工程師的砲台與子彈 */
+    private void renderTurret(GraphicsContext gc, TurretSkill skill) {
+        var turret = skill.getTurret();
+
+        // 1. 畫飛行的子彈
+        for (var b : skill.getBullets()) {
+            gc.setFill(Color.GOLD);
+            gc.fillOval(b.x - TurretSkill.TurretBullet.RADIUS, b.y - TurretSkill.TurretBullet.RADIUS,
+                    TurretSkill.TurretBullet.RADIUS * 2, TurretSkill.TurretBullet.RADIUS * 2);
+            gc.setStroke(Color.WHITE);
+            gc.setLineWidth(1);
+            gc.strokeOval(b.x - TurretSkill.TurretBullet.RADIUS, b.y - TurretSkill.TurretBullet.RADIUS,
+                    TurretSkill.TurretBullet.RADIUS * 2, TurretSkill.TurretBullet.RADIUS * 2);
+        }
+
+        if (turret == null) return; // 砲台尚未佈署
+
+        double r = turret.radius;
+
+        // 根據等級改變砲台主色
+        Color turretColor = switch (turret.level) {
+            case 1 -> Color.LIGHTGRAY;
+            case 2 -> Color.YELLOW;
+            case 3 -> Color.ORANGE;
+            default -> Color.DARKGRAY; // 0級 (未啟動)
+        };
+
+        // 2. 畫砲管 (0級不畫砲管)
+        if (turret.level > 0) {
+            gc.save();
+            // 將畫布原點移動到砲台中心，並旋轉到瞄準敵人的角度
+            gc.translate(turret.x, turret.y);
+            gc.rotate(Math.toDegrees(turret.angle));
+
+            gc.setFill(Color.DARKSLATEGRAY);
+            // 畫一個長方形砲管，從中心往右延伸 22px，高度為 8px
+            gc.fillRect(0, -4, 22, 8);
+            gc.restore();
+        }
+
+        // 3. 畫砲台基座 (圓形固定大小)
+        gc.setFill(turretColor);
+        gc.fillOval(turret.x - r, turret.y - r, r * 2, r * 2);
+        gc.setStroke(Color.DARKSLATEGRAY);
+        gc.setLineWidth(2);
+        gc.strokeOval(turret.x - r, turret.y - r, r * 2, r * 2);
     }
 }

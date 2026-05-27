@@ -1,6 +1,7 @@
 package BallArena.model;
 
 import BallArena.ability.FireSpell;
+import BallArena.ability.TurretSkill;
 
 /** 負責移動、牆壁反彈、球與球碰撞（純 Java，不依賴 JavaFX） */
 public class PhysicsEngine {
@@ -24,6 +25,11 @@ public class PhysicsEngine {
     private static final double FIRE_POPUP_INTERVAL = 1.0;
     private double firePopupTimer       = 0;
     private double fireAccumulatedDmg   = 0;
+
+    // 砲台範圍傷害：每幀扣血，每秒結算一次 popup 顯示
+    private static final double TURRET_POPUP_INTERVAL = 1.0;
+    private double turretPopupTimer     = 0;
+    private double turretAccumulatedDmg = 0;
 
     public void update(Ball ball, double deltaTime) {
         // 移動
@@ -88,6 +94,7 @@ public class PhysicsEngine {
         swordCooldown = Math.max(0, swordCooldown - deltaTime);
         spikeCooldown = Math.max(0, spikeCooldown - deltaTime);
         firePopupTimer += deltaTime;
+        turretPopupTimer += deltaTime;
     }
 
     /**
@@ -248,5 +255,52 @@ public class PhysicsEngine {
                 b.setVy(b.getVy() - dot * ny);
             }
         }
+    }
+
+    public void checkTurretUpgrade(EngineerBall engineer) {
+        var skill = engineer.getTurretSkill();
+        var turret = skill.getTurret();
+
+        // 砲台還沒放下，或是還在冷卻中，就不處理
+        if (turret == null || !skill.canUpgrade()) return;
+
+        // 計算球心與砲台中心的距離
+        double dx = engineer.getX() - turret.x;
+        double dy = engineer.getY() - turret.y;
+        double distSq = dx * dx + dy * dy;
+
+        double hitRadius = engineer.getRadius() + turret.radius;
+
+        // 發生碰撞
+        if (distSq < hitRadius * hitRadius) {
+            turret.upgrade();
+            skill.resetUpgradeCooldown(); // 進入冷卻，避免瞬間升滿
+
+            // 視角回饋：你可以在這裡產生一個 popup 顯示 "Level Up!"
+        }
+    }
+    /**
+     * 檢查砲台子彈是否擊中目標
+     * @return 該幀造成的總傷害（供 popup 顯示）
+     */
+    public double checkTurretBulletHit(EngineerBall attacker, Ball target) {
+        var bullets = attacker.getTurretSkill().getBullets();
+        var it = bullets.iterator();
+        double totalDamage = 0;
+
+        while (it.hasNext()) {
+            var b = it.next();
+            double dx = target.getX() - b.x;
+            double dy = target.getY() - b.y;
+            double hitRadius = target.getRadius() + TurretSkill.TurretBullet.RADIUS;
+
+            // 如果子彈碰到敵人
+            if (dx * dx + dy * dy < hitRadius * hitRadius) {
+                target.takeDamage(b.damage);
+                totalDamage += b.damage;
+                it.remove(); // 子彈命中後消失
+            }
+        }
+        return totalDamage;
     }
 }

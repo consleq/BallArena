@@ -21,6 +21,7 @@ public class SelectController {
     @FXML private Button spikeButton;
     @FXML private Button fireButton;
     @FXML private Button backButton;
+    @FXML private Button engineerButton;
 
     private static final Random RNG = new Random();
 
@@ -38,6 +39,9 @@ public class SelectController {
     private void onSelectFire() {
         startGame(BallType.FIRE);
     }
+
+    @FXML
+    private void onSelectEngineer() { startGame(BallType.ENGINEER); }
 
     @FXML
     private void onBackToMenu() throws Exception {

@@ -49,6 +49,9 @@ public class GameController {
         if (ball1 instanceof FireBall fb1) fb1.setTarget(ball2);
         if (ball2 instanceof FireBall fb2) fb2.setTarget(ball1);
 
+        if (ball1 instanceof EngineerBall eb1) eb1.setTarget(ball2);
+        if (ball2 instanceof EngineerBall eb2) eb2.setTarget(ball1);
+
         Random rng = new Random();
         double speed = 180;
         double angle1 = rng.nextDouble() * Math.PI * 2;
@@ -79,6 +82,7 @@ public class GameController {
             case SWORD -> new SwordBall(x, y, style);
             case SPIKE -> new SpikeBall(x, y, style);
             case FIRE  -> new FireBall(x, y, style);
+            case ENGINEER -> new EngineerBall(x, y, style);
         };
     }
 
@@ -88,6 +92,9 @@ public class GameController {
         physics.update(ball1, deltaTime);
         physics.update(ball2, deltaTime);
         physics.handleBallCollision(ball1, ball2);
+        // 判定工程師是否撞擊自己的砲台升級
+        if (ball1 instanceof EngineerBall eb1) physics.checkTurretUpgrade(eb1);
+        if (ball2 instanceof EngineerBall eb2) physics.checkTurretUpgrade(eb2);
         ball1.updateAbility(deltaTime);
         ball2.updateAbility(deltaTime);
 
@@ -119,6 +126,14 @@ public class GameController {
         if (ball2 instanceof FireBall fb2) {
             double dmg = physics.checkFireZoneDamage(fb2, ball1, deltaTime);
             if (dmg >= 1.0) popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
+        }
+        if (ball1 instanceof EngineerBall eb1) {
+            double dmg = physics.checkTurretBulletHit(eb1, ball2);
+            if (dmg > 0) popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
+        }
+        if (ball2 instanceof EngineerBall eb2) {
+            double dmg = physics.checkTurretBulletHit(eb2, ball1);
+            if (dmg > 0) popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
         }
 
         checkGameOver();
