@@ -128,5 +128,27 @@ public class AbilityRenderer {
         gc.setStroke(Color.DARKSLATEGRAY);
         gc.setLineWidth(2);
         gc.strokeOval(turret.x - r, turret.y - r, r * 2, r * 2);
+
+        // 4. 高等級時，在砲台上方畫剩餘時間進度條
+        if (turret.level >= 2) {
+            double barWidth = 28;
+            double barHeight = 4;
+            double barX = turret.x - barWidth / 2;
+            double barY = turret.y - r - 8;
+            double progress = turret.getLevelProgress();
+
+            // 背景（深灰）
+            gc.setFill(Color.color(0, 0, 0, 0.55));
+            gc.fillRect(barX - 1, barY - 1, barWidth + 2, barHeight + 2);
+
+            // 進度（依等級顏色）
+            gc.setFill(turret.level == 3 ? Color.ORANGE : Color.YELLOW);
+            gc.fillRect(barX, barY, barWidth * progress, barHeight);
+
+            // 外框
+            gc.setStroke(Color.WHITE);
+            gc.setLineWidth(1);
+            gc.strokeRect(barX, barY, barWidth, barHeight);
+        }
     }
 }
