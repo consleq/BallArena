@@ -26,13 +26,43 @@ public class TurretSkill implements Ability {
         public final double radius = 14; // 固定的基座半徑
         public double angle = 0;         // 砲管朝向（弧度）
 
+        // 高等級的維持時間（秒）；達到 0 時降回前一等級
+        public double timeLeft = 0;
+
         public Turret(double x, double y) {
             this.x = x;
             this.y = y;
         }
 
+        /** 各等級的維持時間；Level 1 為永久（回傳 0 表示無倒數） */
+        public static double getDurationFor(int level) {
+            return switch (level) {
+                case 2 -> 10.0;
+                case 3 -> 5.0;
+                default -> 0.0;
+            };
+        }
+
         public void upgrade() {
-            if (level < 3) level++;
+            if (level < 3) {
+                level++;
+                timeLeft = getDurationFor(level);
+            }
+        }
+
+        /** 倒數結束後降回前一等級，並重置該等級的倒數 */
+        public void downgrade() {
+            if (level > 1) {
+                level--;
+                timeLeft = getDurationFor(level);
+            }
+        }
+
+        /** 進度條的填充比例（0~1）；Level 1 或更低回傳 0 表示不顯示 */
+        public double getLevelProgress() {
+            double duration = getDurationFor(level);
+            if (duration <= 0) return 0;
+            return Math.max(0, Math.min(1, timeLeft / duration));
         }
 
         // 依據等級決定發射間隔 (秒)
@@ -49,8 +79,8 @@ public class TurretSkill implements Ability {
         public double getBulletDamage() {
             return switch (level) {
                 case 1 -> 1.0;
-                case 2 -> 2.0;
-                case 3 -> 3.0;
+                case 2 -> 1.0;
+                case 3 -> 2.0;
                 default -> 0.0;
             };
         }
@@ -89,6 +119,14 @@ public class TurretSkill implements Ability {
         }
 
         if (upgradeCooldown > 0) upgradeCooldown -= deltaTime;
+
+        // 1.5 高等級維持時間倒數；到 0 時降一級
+        if (turret != null && turret.level >= 2) {
+            turret.timeLeft -= deltaTime;
+            if (turret.timeLeft <= 0) {
+                turret.downgrade();
+            }
+        }
 
         // 2. 瞄準與發射
         if (turret != null && turret.level > 0 && target != null) {

@@ -46,6 +46,10 @@ public abstract class Ball {
         hp = Math.max(0, hp - dmg);
     }
 
+    public void heal(double amount) {
+        hp = Math.min(maxHp, hp + amount);
+    }
+
     public boolean isDead() {
         return hp <= 0;
     }

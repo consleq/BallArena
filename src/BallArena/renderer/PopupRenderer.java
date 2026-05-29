@@ -39,6 +39,11 @@ public class PopupRenderer {
         popups.add(new DamagePopup(x, y, damage));
     }
 
+    /** 在場地座標 (x, y) 處新增一個回血 popup */
+    public void addHealPopup(double x, double y, double amount) {
+        popups.add(new DamagePopup(x, y, "+" + (int) amount, Color.color(0.25, 1.0, 0.25)));
+    }
+
     /** 每幀呼叫：倒數計時並讓文字向上飄移 */
     public void update(double deltaTime) {
         Iterator<DamagePopup> it = popups.iterator();
@@ -65,7 +70,8 @@ public class PopupRenderer {
         gc.setTextAlign(TextAlignment.CENTER);
 
         for (DamagePopup p : popups) {
-            gc.setFill(Color.color(1.0, 0.25, 0.25, p.getAlpha()));
+            Color c = p.color;
+            gc.setFill(Color.color(c.getRed(), c.getGreen(), c.getBlue(), p.getAlpha()));
             gc.fillText(p.text, p.x, p.y);
         }
 

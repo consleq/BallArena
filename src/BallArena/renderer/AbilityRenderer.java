@@ -8,7 +8,9 @@ import BallArena.model.Ball;
 import BallArena.model.FireBall;
 import BallArena.model.SpikeBall;
 import BallArena.model.SwordBall;
+import BallArena.model.VampireBall;
 import BallArena.ability.RotatingSword;
+import BallArena.ability.VampireAbility;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -24,7 +26,28 @@ public class AbilityRenderer {
             renderFireSpell(gc, fb.getFireSpell());
         } else if (ball instanceof EngineerBall eb) {
             renderTurret(gc, eb.getTurretSkill());
+        } else if (ball instanceof VampireBall vb) {
+            renderVampireTether(gc, vb.getVampireAbility());
         }
+    }
+
+    private void renderVampireTether(GraphicsContext gc, VampireAbility ability) {
+        if (!ability.isTethered()) return;
+
+        Ball owner = ability.getOwner();
+        Ball target = ability.getTarget();
+
+        gc.save();
+        // 繪製一條紅色的牽引線
+        gc.setStroke(Color.color(1.0, 0.0, 0.0, 0.8));
+        gc.setLineWidth(5); // 線條變粗
+        gc.strokeLine(owner.getX(), owner.getY(), target.getX(), target.getY());
+        
+        // 在連結點畫特效
+        gc.setFill(Color.RED);
+        gc.fillOval(target.getX() - 6, target.getY() - 6, 12, 12);
+        
+        gc.restore();
     }
 
     private void renderSword(GraphicsContext gc, RotatingSword sword) {
@@ -128,5 +151,27 @@ public class AbilityRenderer {
         gc.setStroke(Color.DARKSLATEGRAY);
         gc.setLineWidth(2);
         gc.strokeOval(turret.x - r, turret.y - r, r * 2, r * 2);
+
+        // 4. 高等級時，在砲台上方畫剩餘時間進度條
+        if (turret.level >= 2) {
+            double barWidth = 28;
+            double barHeight = 4;
+            double barX = turret.x - barWidth / 2;
+            double barY = turret.y - r - 8;
+            double progress = turret.getLevelProgress();
+
+            // 背景（深灰）
+            gc.setFill(Color.color(0, 0, 0, 0.55));
+            gc.fillRect(barX - 1, barY - 1, barWidth + 2, barHeight + 2);
+
+            // 進度（依等級顏色）
+            gc.setFill(turret.level == 3 ? Color.ORANGE : Color.YELLOW);
+            gc.fillRect(barX, barY, barWidth * progress, barHeight);
+
+            // 外框
+            gc.setStroke(Color.WHITE);
+            gc.setLineWidth(1);
+            gc.strokeRect(barX, barY, barWidth, barHeight);
+        }
     }
 }

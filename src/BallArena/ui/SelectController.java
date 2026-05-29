@@ -22,6 +22,7 @@ public class SelectController {
     @FXML private Button fireButton;
     @FXML private Button backButton;
     @FXML private Button engineerButton;
+    @FXML private Button vampireButton;
 
     private static final Random RNG = new Random();
 
@@ -42,6 +43,9 @@ public class SelectController {
 
     @FXML
     private void onSelectEngineer() { startGame(BallType.ENGINEER); }
+
+    @FXML
+    private void onSelectVampire() { startGame(BallType.VAMPIRE); }
 
     @FXML
     private void onBackToMenu() throws Exception {

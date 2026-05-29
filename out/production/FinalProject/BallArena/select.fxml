@@ -82,6 +82,20 @@
                     styleClass="menu-button"/>
         </VBox>
 
+        <VBox alignment="CENTER" spacing="12" prefWidth="220"
+              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 22;">
+            <Label text="吸血球"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #d00000;"/>
+            <Label text="射出一條紅色連結線牽引敵人，造成持續傷害並週期性回復生命"
+                   wrapText="true"
+                   style="-fx-font-size: 12px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
+            <Label text="秒傷：3 | 回復：5 (每3秒)"
+                   style="-fx-font-size: 11px; -fx-text-fill: #888888;"/>
+            <Button fx:id="vampireButton" text="選擇吸血球" onAction="#onSelectVampire"
+                    prefWidth="160" prefHeight="40"
+                    styleClass="menu-button"/>
+        </VBox>
+
     </HBox>
 
     <Button fx:id="backButton" text="返回主選單" onAction="#onBackToMenu"
