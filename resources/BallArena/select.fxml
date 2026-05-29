@@ -61,7 +61,7 @@
             <Label text="鎖定敵方位置發射火球，命中或牆壁爆炸造成範圍傷害"
                    wrapText="true"
                    style="-fx-font-size: 12px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
-            <Label text="一次性傷害：4"
+            <Label text="一次性傷害：直接 8 | 爆炸 5"
                    style="-fx-font-size: 11px; -fx-text-fill: #888888;"/>
             <Button fx:id="fireButton" text="選擇火球" onAction="#onSelectFire"
                     prefWidth="160" prefHeight="40"
@@ -89,7 +89,7 @@
             <Label text="射出一條紅色連結線牽引敵人，造成持續傷害並週期性回復生命"
                    wrapText="true"
                    style="-fx-font-size: 12px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
-            <Label text="秒傷：3 | 回復：5 (每3秒)"
+            <Label text="秒傷：3 | 回復：2 (每2秒)"
                    style="-fx-font-size: 11px; -fx-text-fill: #888888;"/>
             <Button fx:id="vampireButton" text="選擇吸血球" onAction="#onSelectVampire"
                     prefWidth="160" prefHeight="40"

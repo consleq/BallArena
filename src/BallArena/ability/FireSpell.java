@@ -29,9 +29,10 @@ public class FireSpell implements Ability {
 
     /** 爆炸特效（純視覺，不再持續造成傷害） */
     public static class FireZone {
-        public static final double RADIUS         = 40;
+        public static final double RADIUS         = 60;
         public static final double VISUAL_DURATION = 0.5;
-        public static final double DAMAGE         = 4.0;
+        public static final double DAMAGE_EXPLOSION = 5.0;
+        public static final double DAMAGE_DIRECT    = 8.0;
 
         public final double x, y;
         public double timeLeft;
@@ -48,7 +49,7 @@ public class FireSpell implements Ability {
     }
 
     private static final double FIRE_INTERVAL    = 1.8;
-    private static final double PROJECTILE_SPEED = 300;
+    private static final double PROJECTILE_SPEED = 400;
     private static final double INITIAL_DELAY    = 0.8;
 
     /** 用 Ball 而非 FireBall 以避免循環相依 */
@@ -148,18 +149,23 @@ public class FireSpell implements Ability {
     private void triggerExplosion(double x, double y, boolean directHit) {
         zones.add(new FireZone(x, y));
 
-        boolean shouldDamage = directHit;
-        if (!directHit) {
-            // 牆壁爆炸：檢查目標是否在爆炸半徑 + 球半徑範圍內
+        double damageApplied = 0;
+        if (directHit) {
+            // 直接命中：扣 8 血
+            damageApplied = FireZone.DAMAGE_DIRECT;
+        } else {
+            // 牆壁爆炸：檢查目標是否在爆炸半徑 + 球半徑範圍內，命中扣 5 血
             double dx = target.getX() - x;
             double dy = target.getY() - y;
             double r  = FireZone.RADIUS + target.getRadius();
-            shouldDamage = (dx * dx + dy * dy < r * r);
+            if (dx * dx + dy * dy < r * r) {
+                damageApplied = FireZone.DAMAGE_EXPLOSION;
+            }
         }
 
-        if (shouldDamage) {
-            target.takeDamage(FireZone.DAMAGE);
-            pendingDamageHits.add(FireZone.DAMAGE);
+        if (damageApplied > 0) {
+            target.takeDamage(damageApplied);
+            pendingDamageHits.add(damageApplied);
         }
     }
 }

@@ -17,8 +17,8 @@ public class VampireAbility implements Ability {
 
     public static final double TETHER_RANGE = 160;
     public static final double TICK_INTERVAL = 1.0;
-    public static final double DAMAGE_PER_TICK = 4.0;
-    public static final double HEAL_PER_3_TICKS = 5.0;
+    public static final double DAMAGE_PER_TICK = 3.0;
+    public static final double HEAL_PER_CYCLE   = 2.0;
 
     private double tickTimer = 0;
     private int tickCount = 0;
@@ -72,10 +72,10 @@ public class VampireAbility implements Ability {
                 target.takeDamage(DAMAGE_PER_TICK);
                 pendingDamageHits.add(DAMAGE_PER_TICK);
 
-                // 每累積滿三次傷害回復5血 (不需連續)
-                if (tickCount >= 3) {
-                    owner.heal(HEAL_PER_3_TICKS);
-                    pendingHealHits.add(HEAL_PER_3_TICKS);
+                // 每累積滿兩次傷害回復血量 (不需連續)
+                if (tickCount >= 2) {
+                    owner.heal(HEAL_PER_CYCLE);
+                    pendingHealHits.add(HEAL_PER_CYCLE);
                     tickCount = 0;
                 }
             }
