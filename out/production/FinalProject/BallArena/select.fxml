@@ -17,7 +17,7 @@
     <VBox alignment="CENTER" spacing="8">
         <Label text="隊伍選擇"
                style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-        <Label text="上下拖動列表來選擇雙方角色"
+        <Label text="滾動右側捲軸來選擇角色"
                style="-fx-font-size: 14px; -fx-text-fill: #aaaaaa;"/>
     </VBox>
 

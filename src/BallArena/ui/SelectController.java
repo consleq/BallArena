@@ -3,11 +3,14 @@ package BallArena.ui;
 import BallArena.model.BallType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -16,7 +19,7 @@ import javafx.stage.Stage;
 
 /**
  * 選球畫面 Controller
- * 改良為雙方皆可手動選擇角色，並支援上下拖動選單。
+ * 使用垂直 ScrollBar 讓雙方各自選擇角色。
  */
 public class SelectController {
 
@@ -25,13 +28,13 @@ public class SelectController {
     @FXML private Button backButton;
     @FXML private Button startButton;
 
-    private DraggableList playerList;
-    private DraggableList enemyList;
+    private ScrollableList playerList;
+    private ScrollableList enemyList;
 
     @FXML
     public void initialize() {
-        playerList = new DraggableList(playerContainer, BallType.values());
-        enemyList = new DraggableList(enemyContainer, BallType.values());
+        playerList = new ScrollableList(playerContainer, BallType.values());
+        enemyList = new ScrollableList(enemyContainer, BallType.values());
     }
 
     @FXML
@@ -68,22 +71,22 @@ public class SelectController {
     }
 
     /**
-     * 內部類別：實現上下拖動選擇列表
+     * 內部類別：使用垂直 ScrollBar 滾動選擇清單
      */
-    private class DraggableList {
+    private class ScrollableList {
         private final VBox content;
         private final BallType[] types;
-        private double startY;
-        private double initialLayoutY;
         private int selectedIndex = 0;
         private final double itemHeight = 80;
         private final double containerHeight = 240;
+        private final double cardWidth = 248;
+        private final ScrollBar scrollBar;
 
-        public DraggableList(StackPane container, BallType[] types) {
+        public ScrollableList(StackPane container, BallType[] types) {
             this.types = types;
             this.content = new VBox();
             this.content.setAlignment(Pos.CENTER);
-            this.content.setPrefWidth(280);
+            this.content.setPrefWidth(cardWidth);
 
             for (BallType type : types) {
                 VBox card = createCard(type);
@@ -91,72 +94,69 @@ public class SelectController {
                 content.getChildren().add(card);
             }
 
-            // 裁切區域
-            Pane clipPane = new Pane(content);
-            Rectangle clip = new Rectangle(280, containerHeight);
-            clipPane.setClip(clip);
-            
+            // 裁切卡片區域
+            Pane cardPane = new Pane(content);
+            Rectangle clip = new Rectangle(cardWidth, containerHeight);
+            cardPane.setClip(clip);
+            cardPane.setPrefSize(cardWidth, containerHeight);
+
             // 選取框（視覺輔助）
             Pane overlay = new Pane();
             overlay.getStyleClass().add("selection-overlay");
-            overlay.setPrefSize(270, itemHeight);
+            overlay.setPrefSize(cardWidth - 10, itemHeight);
             overlay.setLayoutX(5);
             overlay.setLayoutY((containerHeight - itemHeight) / 2);
             overlay.setMouseTransparent(true);
-            
-            container.getChildren().addAll(clipPane, overlay);
+            cardPane.getChildren().add(overlay);
 
-            // 初始置中第一個項目
+            // 垂直 ScrollBar
+            this.scrollBar = new ScrollBar();
+            scrollBar.setOrientation(Orientation.VERTICAL);
+            scrollBar.setMin(0);
+            scrollBar.setMax(Math.max(0, types.length - 1));
+            scrollBar.setValue(0);
+            scrollBar.setBlockIncrement(1);
+            scrollBar.setUnitIncrement(1);
+            scrollBar.setPrefHeight(containerHeight);
+
+            scrollBar.valueProperty().addListener((obs, oldVal, newVal) -> {
+                int idx = (int) Math.round(newVal.doubleValue());
+                if (idx != selectedIndex) {
+                    snapTo(idx);
+                }
+            });
+
+            HBox layout = new HBox(cardPane, scrollBar);
+            layout.setPrefSize(280, containerHeight);
+
+            container.getChildren().add(layout);
             snapTo(0);
-
-            // 拖動邏輯
-            content.setOnMousePressed(e -> {
-                startY = e.getSceneY();
-                initialLayoutY = content.getLayoutY();
-            });
-
-            content.setOnMouseDragged(e -> {
-                double deltaY = e.getSceneY() - startY;
-                double newY = initialLayoutY + deltaY;
-                
-                // 限制拖動範圍（稍微超出邊界一點，增加彈性感）
-                double minY = (containerHeight - itemHeight) / 2 - (types.length - 1) * itemHeight - 50;
-                double maxY = (containerHeight - itemHeight) / 2 + 50;
-                content.setLayoutY(Math.max(minY, Math.min(maxY, newY)));
-            });
-
-            content.setOnMouseReleased(e -> snap());
         }
 
         private VBox createCard(BallType type) {
             VBox card = new VBox();
             card.getStyleClass().add("ball-card");
-            
+
             Label title = new Label(type.getDisplayName());
             title.getStyleClass().add("ball-card-title");
-            
+
             Label desc = new Label(type.getDescription());
             desc.getStyleClass().add("ball-card-desc");
             desc.setWrapText(true);
-            desc.setPrefWidth(240);
-            
+            desc.setPrefWidth(220);
+
             card.getChildren().addAll(title, desc);
             return card;
         }
 
-        private void snap() {
-            double currentY = content.getLayoutY();
-            double centerOffset = (containerHeight - itemHeight) / 2;
-            selectedIndex = (int) Math.round((centerOffset - currentY) / itemHeight);
-            selectedIndex = Math.max(0, Math.min(types.length - 1, selectedIndex));
-            
-            snapTo(selectedIndex);
-        }
-
         private void snapTo(int index) {
-            selectedIndex = index;
+            selectedIndex = Math.max(0, Math.min(types.length - 1, index));
             double targetY = (containerHeight - itemHeight) / 2 - (selectedIndex * itemHeight);
             content.setLayoutY(targetY);
+            // 同步 ScrollBar 位置（避免循環觸發）
+            if (Math.abs(scrollBar.getValue() - selectedIndex) > 0.01) {
+                scrollBar.setValue(selectedIndex);
+            }
         }
 
         public BallType getSelectedType() {
