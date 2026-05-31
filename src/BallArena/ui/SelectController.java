@@ -109,6 +109,12 @@ public class SelectController {
             overlay.setMouseTransparent(true);
             cardPane.getChildren().add(overlay);
 
+            // 滑鼠滾輪滾動卡片區域
+            cardPane.setOnScroll(e -> {
+                int delta = e.getDeltaY() < 0 ? 1 : -1;
+                snapTo(selectedIndex + delta);
+            });
+
             // 垂直 ScrollBar
             this.scrollBar = new ScrollBar();
             scrollBar.setOrientation(Orientation.VERTICAL);
