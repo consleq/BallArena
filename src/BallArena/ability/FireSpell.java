@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * FireBall 的技能：
+ * pushtest
  *  - 每隔 FIRE_INTERVAL 秒朝當前目標位置發射火球
  *  - 火球碰到目標 → 直接扣 EXPLOSION_DAMAGE 點傷害
  *  - 火球碰到牆壁 → 在落點產生一次性爆炸，目標若在範圍內則扣 EXPLOSION_DAMAGE 點傷害
