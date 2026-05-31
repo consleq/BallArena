@@ -11,6 +11,7 @@ public class BallColorMap {
         return switch (style) {
             case BLUE -> Color.CORNFLOWERBLUE;
             case RED  -> Color.TOMATO;
+            case MYSTERY -> Color.GOLD;
         };
     }
-}
+    }

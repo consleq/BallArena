@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
@@ -8,97 +9,42 @@
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="BallArena.ui.SelectController"
       stylesheets="@styles.css"
-      alignment="CENTER" spacing="20"
+      alignment="CENTER" spacing="30"
       prefWidth="800" prefHeight="600"
       style="-fx-background-color: #0f0f1a;">
     <padding><Insets top="30" bottom="30" left="40" right="40"/></padding>
 
     <VBox alignment="CENTER" spacing="8">
-        <Label text="選擇你的球種"
+        <Label text="隊伍選擇"
                style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-        <Label text="選好之後，對手會從所有球種中隨機選一個"
+        <Label text="上下拖動列表來選擇雙方角色"
                style="-fx-font-size: 14px; -fx-text-fill: #aaaaaa;"/>
     </VBox>
 
-    <HBox alignment="CENTER" spacing="20">
-
-        <VBox alignment="CENTER" spacing="12" prefWidth="220"
-              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 22;">
-            <Label text="劍球"
-                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: silver;"/>
-            <Label text="一把劍以固定角速度繞球旋轉"
-                   wrapText="true"
-                   style="-fx-font-size: 12px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
-            <Label text="命中傷害：5"
-                   style="-fx-font-size: 11px; -fx-text-fill: #888888;"/>
-            <Button fx:id="swordButton" text="選擇劍球" onAction="#onSelectSword"
-                    prefWidth="160" prefHeight="40"
-                    styleClass="menu-button"/>
+    <HBox alignment="CENTER" spacing="60">
+        <!-- Player Team Selection -->
+        <VBox alignment="CENTER" spacing="15">
+            <Label text="玩家 (Player)" style="-fx-text-fill: #6495ED; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+            <StackPane fx:id="playerContainer" prefWidth="280" prefHeight="240"
+                       style="-fx-background-color: #161625; -fx-background-radius: 15; -fx-border-color: #6495ED; -fx-border-radius: 15; -fx-border-width: 2;">
+            </StackPane>
         </VBox>
 
-        <VBox alignment="CENTER" spacing="12" prefWidth="220"
-              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 22;">
-            <Label text="尖刺球"
-                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: orangered;"/>
-            <Label text="每次碰牆生成尖刺，敵方撞到尖端會被反彈"
-                   wrapText="true"
-                   style="-fx-font-size: 12px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
-            <Label text="命中傷害：3"
-                   style="-fx-font-size: 11px; -fx-text-fill: #888888;"/>
-            <Button fx:id="spikeButton" text="選擇尖刺球" onAction="#onSelectSpike"
-                    prefWidth="160" prefHeight="40"
-                    styleClass="menu-button"/>
+        <!-- Enemy Team Selection -->
+        <VBox alignment="CENTER" spacing="15">
+            <Label text="敵方 (Enemy)" style="-fx-text-fill: #FF6347; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+            <StackPane fx:id="enemyContainer" prefWidth="280" prefHeight="240"
+                       style="-fx-background-color: #161625; -fx-background-radius: 15; -fx-border-color: #FF6347; -fx-border-radius: 15; -fx-border-width: 2;">
+            </StackPane>
         </VBox>
-
     </HBox>
 
-    <HBox alignment="CENTER" spacing="20">
-
-        <VBox alignment="CENTER" spacing="12" prefWidth="220"
-              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 22;">
-            <Label text="火球"
-                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;"/>
-            <Label text="鎖定敵方位置發射火球，命中或牆壁爆炸造成範圍傷害"
-                   wrapText="true"
-                   style="-fx-font-size: 12px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
-            <Label text="一次性傷害：直接 8 | 爆炸 5"
-                   style="-fx-font-size: 11px; -fx-text-fill: #888888;"/>
-            <Button fx:id="fireButton" text="選擇火球" onAction="#onSelectFire"
-                    prefWidth="160" prefHeight="40"
-                    styleClass="menu-button"/>
-        </VBox>
-
-        <VBox alignment="CENTER" spacing="12" prefWidth="220"
-              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 22;">
-            <Label text="工程師"
-                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #4ea8de;"/>
-            <Label text="開場2秒放置砲台，本體撞擊砲台可使其升級"
-                   wrapText="true"
-                   style="-fx-font-size: 12px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
-            <Label text="砲台定時自動防禦"
-                   style="-fx-font-size: 11px; -fx-text-fill: #888888;"/>
-            <Button fx:id="engineerButton" text="選擇工程師" onAction="#onSelectEngineer"
-                    prefWidth="160" prefHeight="40"
-                    styleClass="menu-button"/>
-        </VBox>
-
-        <VBox alignment="CENTER" spacing="12" prefWidth="220"
-              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 22;">
-            <Label text="吸血球"
-                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #d00000;"/>
-            <Label text="射出一條紅色連結線牽引敵人，造成持續傷害並週期性回復生命"
-                   wrapText="true"
-                   style="-fx-font-size: 12px; -fx-text-fill: #c8c8c8; -fx-text-alignment: center;"/>
-            <Label text="秒傷：3 | 回復：2 (每2秒)"
-                   style="-fx-font-size: 11px; -fx-text-fill: #888888;"/>
-            <Button fx:id="vampireButton" text="選擇吸血球" onAction="#onSelectVampire"
-                    prefWidth="160" prefHeight="40"
-                    styleClass="menu-button"/>
-        </VBox>
-
+    <HBox alignment="CENTER" spacing="30">
+        <Button fx:id="startButton" text="開始戰鬥" onAction="#onStartBattle"
+                prefWidth="200" prefHeight="50"
+                styleClass="menu-button" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+        <Button fx:id="backButton" text="返回主選單" onAction="#onBackToMenu"
+                prefWidth="140" prefHeight="50"
+                styleClass="back-button"/>
     </HBox>
-
-    <Button fx:id="backButton" text="返回主選單" onAction="#onBackToMenu"
-            prefWidth="140" prefHeight="36"
-            styleClass="back-button"/>
 </VBox>

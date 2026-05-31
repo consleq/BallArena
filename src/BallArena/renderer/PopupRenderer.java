@@ -44,6 +44,16 @@ public class PopupRenderer {
         popups.add(new DamagePopup(x, y, "+" + (int) amount, Color.color(0.25, 1.0, 0.25)));
     }
 
+    /** 在場地座標 (x, y) 處新增一個免疫/閃避 popup */
+    public void addMissPopup(double x, double y, double amount) {
+        popups.add(new DamagePopup(x, y, String.valueOf((int) amount), Color.WHITE));
+    }
+
+    /** 在場地座標 (x, y) 處新增一個自訂文字 popup */
+    public void addTextPopup(double x, double y, String text, Color color) {
+        popups.add(new DamagePopup(x, y, text, color));
+    }
+
     /** 每幀呼叫：倒數計時並讓文字向上飄移 */
     public void update(double deltaTime) {
         Iterator<DamagePopup> it = popups.iterator();

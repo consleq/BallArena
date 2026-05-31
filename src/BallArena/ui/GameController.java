@@ -69,6 +69,9 @@ public class GameController {
         if (ball1 instanceof VampireBall vb1) vb1.setTarget(ball2);
         if (ball2 instanceof VampireBall vb2) vb2.setTarget(ball1);
 
+        if (ball1 instanceof MysteryBall mb1) mb1.setTarget(ball2);
+        if (ball2 instanceof MysteryBall mb2) mb2.setTarget(ball1);
+
         Random rng = new Random();
         double speed = 180;
         double angle1 = rng.nextDouble() * Math.PI * 2;
@@ -101,6 +104,7 @@ public class GameController {
             case FIRE  -> new FireBall(x, y, style);
             case ENGINEER -> new EngineerBall(x, y, style);
             case VAMPIRE -> new VampireBall(x, y, style);
+            case MYSTERY -> new MysteryBall(x, y, BallStyle.MYSTERY);
         };
     }
 
@@ -178,6 +182,42 @@ public class GameController {
             }
             for (Double heal : vb2.getVampireAbility().drainHealHits()) {
                 popupRenderer.addHealPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, heal);
+            }
+        }
+
+        // 神秘球：觸發由 PhysicsEngine 處理，這裡顯示 popup
+        if (ball1 instanceof MysteryBall mb1) {
+            for (Double dmg : mb1.drainDamageHits()) {
+                popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
+            }
+            for (Double heal : mb1.drainHealHits()) {
+                popupRenderer.addHealPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, heal);
+            }
+            for (Double miss : mb1.drainMissHits()) {
+                popupRenderer.addMissPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, miss);
+            }
+            if (mb1.checkAndResetSymbolDmg()) {
+                popupRenderer.addTextPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 15, "!", Color.GOLD);
+            }
+            if (mb1.checkAndResetSymbolHeal()) {
+                popupRenderer.addTextPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 15, "?", Color.CYAN);
+            }
+        }
+        if (ball2 instanceof MysteryBall mb2) {
+            for (Double dmg : mb2.drainDamageHits()) {
+                popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
+            }
+            for (Double heal : mb2.drainHealHits()) {
+                popupRenderer.addHealPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, heal);
+            }
+            for (Double miss : mb2.drainMissHits()) {
+                popupRenderer.addMissPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, miss);
+            }
+            if (mb2.checkAndResetSymbolDmg()) {
+                popupRenderer.addTextPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 15, "!", Color.GOLD);
+            }
+            if (mb2.checkAndResetSymbolHeal()) {
+                popupRenderer.addTextPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 15, "?", Color.CYAN);
             }
         }
 

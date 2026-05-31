@@ -17,7 +17,7 @@ public class RotatingSword implements Ability {
     public static final double SWORD_DISTANCE = 40;
 
     /** 劍的長度 */
-    public static final double SWORD_LENGTH = 50;
+    public static final double SWORD_LENGTH = 60;
 
     public RotatingSword(Ball owner) {
         this.owner = owner;

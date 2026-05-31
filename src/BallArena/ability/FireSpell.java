@@ -49,7 +49,7 @@ public class FireSpell implements Ability {
     }
 
     private static final double FIRE_INTERVAL    = 1.8;
-    private static final double PROJECTILE_SPEED = 400;
+    private static final double PROJECTILE_SPEED = 350;
     private static final double INITIAL_DELAY    = 0.8;
 
     /** 用 Ball 而非 FireBall 以避免循環相依 */

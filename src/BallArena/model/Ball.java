@@ -42,8 +42,14 @@ public abstract class Ball {
     public void setVx(double vx) { this.vx = vx; }
     public void setVy(double vy) { this.vy = vy; }
 
-    public void takeDamage(double dmg) {
+    /**
+     * 對球造成傷害
+     * @return 實際扣除的血量
+     */
+    public double takeDamage(double dmg) {
+        double oldHp = hp;
         hp = Math.max(0, hp - dmg);
+        return oldHp - hp;
     }
 
     public void heal(double amount) {

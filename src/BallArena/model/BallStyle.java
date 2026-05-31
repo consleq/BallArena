@@ -6,7 +6,8 @@ package BallArena.model;
  */
 public enum BallStyle {
     BLUE("藍球"),
-    RED ("紅球");
+    RED ("紅球"),
+    MYSTERY("神秘球");
 
     private final String displayName;
 

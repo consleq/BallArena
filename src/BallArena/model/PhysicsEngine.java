@@ -19,6 +19,7 @@ public class PhysicsEngine {
     // 避免連續扣血的冷卻時間（秒）
     private double swordCooldown = 0;
     private double spikeCooldown = 0;
+    private double mysteryCooldown = 0;
     private static final double HIT_COOLDOWN = 0.5;
 
     // 火球範圍傷害：每幀少量扣血、每秒結算一次 popup 顯示
@@ -92,8 +93,9 @@ public class PhysicsEngine {
 
     /** 更新冷卻計時器，每幀呼叫 */
     public void updateCooldowns(double deltaTime) {
-        swordCooldown = Math.max(0, swordCooldown - deltaTime);
-        spikeCooldown = Math.max(0, spikeCooldown - deltaTime);
+        swordCooldown   = Math.max(0, swordCooldown - deltaTime);
+        spikeCooldown   = Math.max(0, spikeCooldown - deltaTime);
+        mysteryCooldown = Math.max(0, mysteryCooldown - deltaTime);
         firePopupTimer += deltaTime;
         turretPopupTimer += deltaTime;
     }
@@ -118,9 +120,9 @@ public class PhysicsEngine {
         double dist = pointToSegmentDistance(cx, cy, ax, ay, bx, by);
 
         if (dist < target.getRadius()) {
-            target.takeDamage(SWORD_DAMAGE);
+            double actualDmg = target.takeDamage(SWORD_DAMAGE);
             swordCooldown = HIT_COOLDOWN;
-            return SWORD_DAMAGE;
+            return actualDmg;
         }
         return 0;
     }
@@ -159,9 +161,9 @@ public class PhysicsEngine {
 
                 // 冷卻內仍會反彈，但不重複扣血
                 if (spikeCooldown <= 0) {
-                    target.takeDamage(SPIKE_DAMAGE);
+                    double actualDmg = target.takeDamage(SPIKE_DAMAGE);
                     spikeCooldown = HIT_COOLDOWN;
-                    return SPIKE_DAMAGE;
+                    return actualDmg;
                 }
                 break; // 一幀只處理一次碰撞
             }
@@ -268,8 +270,7 @@ public class PhysicsEngine {
 
             // 如果子彈碰到敵人
             if (dx * dx + dy * dy < hitRadius * hitRadius) {
-                target.takeDamage(b.damage);
-                totalDamage += b.damage;
+                totalDamage += target.takeDamage(b.damage);
                 it.remove(); // 子彈命中後消失
             }
         }
