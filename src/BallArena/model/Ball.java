@@ -46,7 +46,7 @@ public abstract class Ball {
     public void setVy(double vy) { this.vy = vy; }
 
     /**
-     * 對球造成傷害
+     * 對球造成傷害.
      * @return 實際扣除的血量
      */
     public double takeDamage(double dmg) {
