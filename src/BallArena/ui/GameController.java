@@ -38,6 +38,8 @@ public class GameController {
     private boolean gameEnded = false;
     private AudioClip bounceSound;
     private AudioClip spikeHitSound;
+    private AudioClip damageSound;
+    private AudioClip healSound;
 
     @FXML
     public void initialize() {
@@ -48,12 +50,22 @@ public class GameController {
         var url = getClass().getResource("/soundfx/Bounce.mp3");
         if (url != null) {
             bounceSound = new AudioClip(url.toExternalForm());
-            bounceSound.setVolume(0.5);
+            bounceSound.setVolume(0.6);
         }
         var spikeUrl = getClass().getResource("/soundfx/SpikeHit.mp3");
         if (spikeUrl != null) {
             spikeHitSound = new AudioClip(spikeUrl.toExternalForm());
             spikeHitSound.setVolume(0.7);
+        }
+        var damageUrl = getClass().getResource("/soundfx/Damage.mp3");
+        if (damageUrl != null) {
+            damageSound = new AudioClip(damageUrl.toExternalForm());
+            damageSound.setVolume(0.5);
+        }
+        var healUrl = getClass().getResource("/soundfx/HealthRegen.mp3");
+        if (healUrl != null) {
+            healSound = new AudioClip(healUrl.toExternalForm());
+            healSound.setVolume(0.7);
         }
         // 球與遊戲迴圈會在 setBallTypes() 被呼叫後才建立
         updateSpeedButtons();
@@ -145,6 +157,11 @@ public class GameController {
     private void update(double deltaTime) {
         if (gameEnded) return;
 
+        // 記錄受傷前血量，用於判斷本步是否有人受到傷害（尖刺有自己的音效，另外處理）
+        double hp1Before = ball1.getHp();
+        double hp2Before = ball2.getHp();
+        boolean spikeHitThisStep = false;
+
         boolean b1Bounce = physics.update(ball1, deltaTime);
         boolean b2Bounce = physics.update(ball2, deltaTime);
         if ((b1Bounce || b2Bounce) && bounceSound != null) bounceSound.play();
@@ -172,6 +189,7 @@ public class GameController {
             if (dmg > 0) {
                 popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
                 if (spikeHitSound != null) spikeHitSound.play();
+                spikeHitThisStep = true;
             }
         }
         if (ball2 instanceof SpikeBall spb2) {
@@ -179,6 +197,7 @@ public class GameController {
             if (dmg > 0) {
                 popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
                 if (spikeHitSound != null) spikeHitSound.play();
+                spikeHitThisStep = true;
             }
         }
         // 火球：扣血由 FireSpell 自己處理，這裡只取走事件顯示 popup
@@ -253,6 +272,18 @@ public class GameController {
             if (mb2.checkAndResetSymbolHeal()) {
                 popupRenderer.addTextPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 15, "?", Color.CYAN);
             }
+        }
+
+        // 任一方血量下降即代表受到傷害；尖刺已有專屬音效，故排除
+        boolean tookDamage = ball1.getHp() < hp1Before || ball2.getHp() < hp2Before;
+        if (tookDamage && !spikeHitThisStep && damageSound != null) {
+            damageSound.play();
+        }
+
+        // 任一方血量上升即代表有回血（吸血球回自己、神秘球幫敵方補血）
+        boolean healed = ball1.getHp() > hp1Before || ball2.getHp() > hp2Before;
+        if (healed && healSound != null) {
+            healSound.play();
         }
 
         checkGameOver();
