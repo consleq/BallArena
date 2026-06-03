@@ -1,5 +1,36 @@
 /* BallArena 共用樣式 */
 
+@font-face {
+    src: url("../fonts/PressStart2P-Regular.ttf");
+}
+
+.title-font {
+    -fx-font-family: "Press Start 2P";
+}
+
+/* 速度快轉按鈕 */
+.speed-button {
+    -fx-background-color: #2a2a45;
+    -fx-text-fill: #aaaaaa;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.speed-button:hover {
+    -fx-background-color: #3a3a60;
+    -fx-text-fill: white;
+}
+
+.speed-button-active {
+    -fx-background-color: #4a4a8a;
+    -fx-text-fill: white;
+    -fx-border-color: #8888cc;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+}
+
 .menu-button {
     -fx-background-color: #4a4a8a;
     -fx-text-fill: white;
@@ -57,4 +88,35 @@
     -fx-border-width: 2;
     -fx-border-radius: 5;
     -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10px;
+}
+
+.scroll-bar:vertical .track {
+    -fx-background-color: #2a2a45;
+    -fx-background-radius: 2;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #6565b0;
+    -fx-background-radius: 2;
+}
+
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #8888cc;
+}
+
+/* 隱藏上下箭頭按鈕 */
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical .increment-arrow,
+.scroll-bar:vertical .decrement-arrow {
+    -fx-shape: "";
 }

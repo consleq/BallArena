@@ -13,7 +13,8 @@
     <padding><Insets top="40" bottom="40" left="40" right="40"/></padding>
 
     <Label text="Ball Arena"
-           style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+           styleClass="title-font"
+           style="-fx-font-size: 36px; -fx-text-fill: white;"/>
     <Label text="選擇你的球種後開始對戰！"
            style="-fx-font-size: 16px; -fx-text-fill: #aaaaaa;"/>
     <Button fx:id="startButton" text="開始遊戲" onAction="#onStartGame"

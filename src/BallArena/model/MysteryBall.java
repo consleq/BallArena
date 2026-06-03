@@ -64,9 +64,9 @@ public class MysteryBall extends Ball {
 
     /** 觸發神秘攻擊效果 */
     private void triggerAttack(Ball target) {
-        if (RNG.nextDouble() < 0.7) {
+        if (RNG.nextDouble() < 0.8) {
             // 80% 造成 1, 3, 5, 10 傷害
-            double[] pool = {3, 4, 5, 6};
+            double[] pool = {1, 3, 5, 10};
             double dmg = pool[RNG.nextInt(pool.length)];
             double actualDmg = target.takeDamage(dmg);
             // 即使被對方免疫，也要顯示驚嘆號，但這裡我們只記錄有造成傷害的 popup

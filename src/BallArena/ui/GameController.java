@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -20,6 +21,12 @@ import java.util.Random;
 public class GameController {
 
     @FXML private Canvas gameCanvas;
+    @FXML private Button speed1xButton;
+    @FXML private Button speed2xButton;
+    @FXML private Button speed4xButton;
+
+    /** 時間快轉倍率（1 / 2 / 4），透過子步驟模擬避免穿牆 */
+    private int speedMultiplier = 1;
 
     private Ball ball1;
     private Ball ball2;
@@ -49,6 +56,30 @@ public class GameController {
             spikeHitSound.setVolume(0.7);
         }
         // 球與遊戲迴圈會在 setBallTypes() 被呼叫後才建立
+        updateSpeedButtons();
+    }
+
+    @FXML private void onSpeed1x() { setSpeed(1); }
+    @FXML private void onSpeed2x() { setSpeed(2); }
+    @FXML private void onSpeed4x() { setSpeed(4); }
+
+    /** 設定快轉倍率並更新按鈕高亮 */
+    private void setSpeed(int multiplier) {
+        speedMultiplier = multiplier;
+        updateSpeedButtons();
+    }
+
+    /** 將目前選中的速度按鈕加上 active 樣式，其餘移除 */
+    private void updateSpeedButtons() {
+        highlight(speed1xButton, speedMultiplier == 1);
+        highlight(speed2xButton, speedMultiplier == 2);
+        highlight(speed4xButton, speedMultiplier == 4);
+    }
+
+    private void highlight(Button button, boolean active) {
+        if (button == null) return;
+        button.getStyleClass().remove("speed-button-active");
+        if (active) button.getStyleClass().add("speed-button-active");
     }
 
     /**
@@ -89,7 +120,10 @@ public class GameController {
                 lastTime = now;
                 deltaTime = Math.min(deltaTime, 0.05);
 
-                update(deltaTime);
+                // 快轉：以多次子步驟模擬，每步仍套用 0.05 上限，避免穿牆
+                for (int i = 0; i < speedMultiplier; i++) {
+                    update(deltaTime);
+                }
                 render();
             }
         };
@@ -104,7 +138,7 @@ public class GameController {
             case FIRE  -> new FireBall(x, y, style);
             case ENGINEER -> new EngineerBall(x, y, style);
             case VAMPIRE -> new VampireBall(x, y, style);
-            case MYSTERY -> new MysteryBall(x, y, BallStyle.MYSTERY);
+            case MYSTERY -> new MysteryBall(x, y, style);
         };
     }
 

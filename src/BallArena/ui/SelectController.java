@@ -123,6 +123,7 @@ public class SelectController {
             scrollBar.setValue(0);
             scrollBar.setBlockIncrement(1);
             scrollBar.setUnitIncrement(1);
+            scrollBar.setVisibleAmount(2);   // 調整滑塊長度，數值越大越長
             scrollBar.setPrefHeight(containerHeight);
 
             scrollBar.valueProperty().addListener((obs, oldVal, newVal) -> {
