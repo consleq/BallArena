@@ -65,14 +65,14 @@ public abstract class Ball {
 
 
     public void slowDown(){
-        if (Math.sqrt((vx*vx) + (vy *vy)) < 600){
+//        if (Math.sqrt((vx*vx) + (vy *vy)) < 600){
             vx = vx*0.5;
             vy = vy*0.5;
-        }
-        else{
-            vx = vx*0.3;
-            vy = vy*0.3;
-        }
+//        }
+//        else{
+//            vx = vx*0.3;
+//            vy = vy*0.3;
+//        }
 
         PauseTransition delay = new PauseTransition(Duration.seconds(0.5));
 

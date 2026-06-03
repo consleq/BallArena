@@ -129,7 +129,7 @@ public class GameController {
         if (ball2 instanceof LightningBall lb2) lb2.setTarget(ball1);
 
         Random rng = new Random();
-        double speed = 180;
+        double speed = 250;
         double angle1 = rng.nextDouble() * Math.PI * 2;
         double angle2 = rng.nextDouble() * Math.PI * 2;
         ball1.setVx(Math.cos(angle1) * speed);

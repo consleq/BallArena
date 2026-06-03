@@ -225,10 +225,21 @@ public class PhysicsEngine {
 
             // 只在兩球靠近時才交換（避免黏在一起）
             if (dot < 0) {
-                a.setVx(a.getVx() + dot * nx);
-                a.setVy(a.getVy() + dot * ny);
-                b.setVx(b.getVx() - dot * nx);
-                b.setVy(b.getVy() - dot * ny);
+                double aDotN = a.getVx() * nx + a.getVy() * ny;
+                double bDotN = b.getVx() * nx + b.getVy() * ny;
+
+                double tempAXspeed = a.getVx() - aDotN * nx + bDotN * nx;
+                double tempAYspeed = a.getVy() - aDotN * ny + bDotN * ny;
+                double tempBXspeed = b.getVx() - bDotN * nx + aDotN * nx;
+                double tempBYspeed = b.getVy() - bDotN * ny + aDotN * ny;
+
+                double aSpeed = Math.sqrt(tempAXspeed * tempAXspeed + tempAYspeed * tempAYspeed);
+                double bSpeed = Math.sqrt(tempBXspeed * tempBXspeed + tempBYspeed * tempBYspeed);
+
+                a.setVx(tempAXspeed / aSpeed * 250);
+                a.setVy(tempAYspeed / aSpeed * 250);
+                b.setVx(tempBXspeed / bSpeed * 250);
+                b.setVy(tempBYspeed / bSpeed * 250);
             }
         }
     }
