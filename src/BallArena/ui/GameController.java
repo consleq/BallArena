@@ -31,7 +31,7 @@ public class GameController {
 
     private Ball ball1;
     private Ball ball2;
-    private PhysicsEngine physics;
+    public PhysicsEngine physics;
     private ArenaRenderer renderer;
     private PopupRenderer popupRenderer;
     private AnimationTimer gameLoop;
@@ -113,6 +113,9 @@ public class GameController {
         if (ball1 instanceof FireBall fb1) fb1.setTarget(ball2);
         if (ball2 instanceof FireBall fb2) fb2.setTarget(ball1);
 
+        if (ball1 instanceof FrozenBall frob1) frob1.setTarget(ball2);
+        if (ball2 instanceof FrozenBall frob2) frob2.setTarget(ball1);
+
         if (ball1 instanceof EngineerBall eb1) eb1.setTarget(ball2);
         if (ball2 instanceof EngineerBall eb2) eb2.setTarget(ball1);
 
@@ -159,6 +162,7 @@ public class GameController {
             case SPIKE -> new SpikeBall(x, y, style);
             case FIRE  -> new FireBall(x, y, style);
             case ENGINEER -> new EngineerBall(x, y, style);
+            case FROZEN -> new FrozenBall(x, y, style);
             case VAMPIRE -> new VampireBall(x, y, style);
             case MYSTERY -> new MysteryBall(x, y, style);
             case LIGHTNING -> new LightningBall(x, y, style);
@@ -221,6 +225,28 @@ public class GameController {
             for (Double dmg : fb2.getFireSpell().drainDamageHits()) {
                 popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
             }
+        }
+        if (ball1 instanceof EngineerBall eb1) {
+            double dmg = physics.checkTurretBulletHit(eb1, ball2);
+            if (dmg > 0) popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
+        }
+        if (ball2 instanceof EngineerBall eb2) {
+            double dmg = physics.checkTurretBulletHit(eb2, ball1);
+            if (dmg > 0) popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
+        }
+
+        // 冰霜球： being 冰霜球
+        if (ball1 instanceof FrozenBall frob1) {
+            for (Double dmg : frob1.getFrozenSpell().drainDamageHits()) {
+                popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
+            }
+        }
+        if (ball2 instanceof FrozenBall frob2) {
+            for (Double dmg : frob2.getFrozenSpell().drainDamageHits()) {
+                popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
+            }
+
+            //工程師球
         }
         if (ball1 instanceof EngineerBall eb1) {
             double dmg = physics.checkTurretBulletHit(eb1, ball2);

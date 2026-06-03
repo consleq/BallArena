@@ -13,6 +13,8 @@ import BallArena.ability.RotatingSword;
 import BallArena.ability.VampireAbility;
 import BallArena.ability.LightningStrike;
 import BallArena.model.LightningBall;
+import BallArena.model.FrozenBall;
+import BallArena.ability.FrozenSpell;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -32,6 +34,8 @@ public class AbilityRenderer {
             renderVampireTether(gc, vb.getVampireAbility());
         } else if (ball instanceof LightningBall lb) {
             renderLightning(gc, lb.getLightningStrike());
+        }   else if (ball instanceof FrozenBall frob) {
+            renderFrozenSpell(gc, frob.getFrozenSpell());
         }
     }
 
@@ -111,6 +115,33 @@ public class AbilityRenderer {
             gc.setFill(Color.ORANGERED);
             gc.fillOval(p.x - r, p.y - r, r * 2, r * 2);
             gc.setStroke(Color.YELLOW);
+            gc.setLineWidth(1);
+            gc.strokeOval(p.x - r, p.y - r, r * 2, r * 2);
+        }
+    }
+//冰球技能
+    private void renderFrozenSpell(GraphicsContext gc, FrozenSpell frozenSpell) {
+        // 先畫範圍傷害區（在下層）
+        for (FrozenSpell.FrozenZone zone : frozenSpell.getZones()) {
+            double alpha = zone.getProgress();
+            double r = FrozenSpell.FrozenZone.RADIUS;
+
+            // 半透明火紅填充
+            gc.setFill(Color.color(0.4, 0.75, 1.0, 0.28 * alpha));
+            gc.fillOval(zone.x - r*1.2, zone.y - r*1.2, r * 2.4, r * 2.4);
+
+            // 較深的邊框
+            gc.setStroke(Color.color(0.05, 0.15, 0.55, 0.85 * alpha));
+            gc.setLineWidth(2);
+            gc.strokeOval(zone.x - r*1.2, zone.y - r*1.2, r * 2.4, r * 2.4);
+        }
+
+        // 再畫飛行中的投射物（在上層）
+        for (FrozenSpell.FrozenProjectile p : frozenSpell.getProjectiles()) {
+            double r = FrozenSpell.FrozenProjectile.RADIUS;
+            gc.setFill(Color.LIGHTBLUE);
+            gc.fillOval(p.x - r, p.y - r, r * 2, r * 2);
+            gc.setStroke(Color.DARKBLUE);
             gc.setLineWidth(1);
             gc.strokeOval(p.x - r, p.y - r, r * 2, r * 2);
         }

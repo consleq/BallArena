@@ -1,5 +1,8 @@
 package BallArena.model;
 
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+
 /** 所有球種的抽象基底類別（不依賴 JavaFX） */
 public abstract class Ball {
 
@@ -58,5 +61,26 @@ public abstract class Ball {
 
     public boolean isDead() {
         return hp <= 0;
+    }
+
+
+    public void slowDown(){
+        if (Math.sqrt((vx*vx) + (vy*vy)) < 600){
+            vx = vx*0.5;
+            vy = vy*0.5;
+        }
+        else{
+            vx = vx*0.3;
+            vy = vy*0.3;
+        }
+
+        PauseTransition delay = new PauseTransition(Duration.seconds(0.5));
+
+        delay.setOnFinished(e -> {
+                vx = vx*2;
+                vy = vy*2;
+        });
+
+        delay.play();
     }
 }

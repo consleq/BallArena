@@ -32,6 +32,8 @@ public class PhysicsEngine {
     private double turretPopupTimer     = 0;
     private double turretAccumulatedDmg = 0;
 
+
+
     public boolean update(Ball ball, double deltaTime) {
         // 移動
         ball.setX(ball.getX() + ball.getVx() * deltaTime);
