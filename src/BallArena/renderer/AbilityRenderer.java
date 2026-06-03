@@ -11,6 +11,8 @@ import BallArena.model.SwordBall;
 import BallArena.model.VampireBall;
 import BallArena.ability.RotatingSword;
 import BallArena.ability.VampireAbility;
+import BallArena.ability.LightningStrike;
+import BallArena.model.LightningBall;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -28,7 +30,31 @@ public class AbilityRenderer {
             renderTurret(gc, eb.getTurretSkill());
         } else if (ball instanceof VampireBall vb) {
             renderVampireTether(gc, vb.getVampireAbility());
+        } else if (ball instanceof LightningBall lb) {
+            renderLightning(gc, lb.getLightningStrike());
         }
+    }
+
+    /** 繪製閃電：每道 Bolt 畫兩層（外層光暈 + 內層亮白），依殘留時間淡出 */
+    private void renderLightning(GraphicsContext gc, LightningStrike strike) {
+        gc.save();
+        gc.setLineCap(javafx.scene.shape.StrokeLineCap.ROUND);
+        gc.setLineJoin(javafx.scene.shape.StrokeLineJoin.ROUND);
+
+        for (LightningStrike.Bolt bolt : strike.getBolts()) {
+            double alpha = bolt.getProgress();
+
+            // 外層光暈（較粗、青色半透明）
+            gc.setStroke(Color.color(0.4, 0.8, 1.0, 0.45 * alpha));
+            gc.setLineWidth(6);
+            gc.strokePolyline(bolt.xs, bolt.ys, bolt.xs.length);
+
+            // 內層電芯（較細、亮白）
+            gc.setStroke(Color.color(1.0, 1.0, 1.0, 0.95 * alpha));
+            gc.setLineWidth(2);
+            gc.strokePolyline(bolt.xs, bolt.ys, bolt.xs.length);
+        }
+        gc.restore();
     }
 
     private void renderVampireTether(GraphicsContext gc, VampireAbility ability) {

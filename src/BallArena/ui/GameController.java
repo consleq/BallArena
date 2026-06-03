@@ -16,6 +16,7 @@ import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.util.List;
 import java.util.Random;
 
 public class GameController {
@@ -40,6 +41,7 @@ public class GameController {
     private AudioClip spikeHitSound;
     private AudioClip damageSound;
     private AudioClip healSound;
+    private AudioClip lightningSound;
 
     @FXML
     public void initialize() {
@@ -66,6 +68,11 @@ public class GameController {
         if (healUrl != null) {
             healSound = new AudioClip(healUrl.toExternalForm());
             healSound.setVolume(0.7);
+        }
+        var lightningUrl = getClass().getResource("/soundfx/LightningStrike.mp3");
+        if (lightningUrl != null) {
+            lightningSound = new AudioClip(lightningUrl.toExternalForm());
+            lightningSound.setVolume(0.7);
         }
         // 球與遊戲迴圈會在 setBallTypes() 被呼叫後才建立
         updateSpeedButtons();
@@ -115,6 +122,9 @@ public class GameController {
         if (ball1 instanceof MysteryBall mb1) mb1.setTarget(ball2);
         if (ball2 instanceof MysteryBall mb2) mb2.setTarget(ball1);
 
+        if (ball1 instanceof LightningBall lb1) lb1.setTarget(ball2);
+        if (ball2 instanceof LightningBall lb2) lb2.setTarget(ball1);
+
         Random rng = new Random();
         double speed = 180;
         double angle1 = rng.nextDouble() * Math.PI * 2;
@@ -151,6 +161,7 @@ public class GameController {
             case ENGINEER -> new EngineerBall(x, y, style);
             case VAMPIRE -> new VampireBall(x, y, style);
             case MYSTERY -> new MysteryBall(x, y, style);
+            case LIGHTNING -> new LightningBall(x, y, style);
         };
     }
 
@@ -271,6 +282,22 @@ public class GameController {
             }
             if (mb2.checkAndResetSymbolHeal()) {
                 popupRenderer.addTextPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 15, "?", Color.CYAN);
+            }
+        }
+
+        // 閃電球：放電由 LightningStrike 自己扣血，這裡只取走事件顯示 popup 並播音效
+        if (ball1 instanceof LightningBall lb1) {
+            List<Double> hits = lb1.getLightningStrike().drainDamageHits();
+            if (!hits.isEmpty() && lightningSound != null) lightningSound.play();
+            for (Double dmg : hits) {
+                popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
+            }
+        }
+        if (ball2 instanceof LightningBall lb2) {
+            List<Double> hits = lb2.getLightningStrike().drainDamageHits();
+            if (!hits.isEmpty() && lightningSound != null) lightningSound.play();
+            for (Double dmg : hits) {
+                popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
             }
         }
 
