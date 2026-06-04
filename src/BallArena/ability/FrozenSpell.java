@@ -2,20 +2,16 @@ package BallArena.ability;
 
 import BallArena.model.ArenaConfig;
 import BallArena.model.Ball;
-import BallArena.ui.GameController;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
-import javafx.util.Duration;
 
 /**
- * Fi0reBall 的技能：
+ * FireBall 的技能：
  * pushtest
- *  - 每隔 FI0RE_INTERVAL 秒朝當前目標位置發射火球
+ *  - 每隔 FIRE_INTERVAL 秒朝當前目標位置發射火球
  *  - 火球碰到目標 → 直接扣 EXPLOSION_DAMAGE 點傷害
  *  - 火球碰到牆壁 → 在落點產生一次性爆炸，目標若在範圍內則扣 EXPLOSION_DAMAGE 點傷害
  *  - 爆炸不持續傷害，僅留下短暫視覺特效
@@ -32,17 +28,22 @@ public class FrozenSpell implements Ability {
         }
     }
 
-    /** 爆炸特效（純視覺，不再持續造成傷害） */
+    /** 爆炸特效，同時追蹤持續傷害與緩速的 tick 狀態 */
     public static class FrozenZone {
-        public static final double RADIUS         = 90;
-        public static final double VISUAL_DURATION = 1.5;
-        public static final double DAMAGE_EXPLOSION = 2.0;
-        public static final double DAMAGE_DIRECT    = 4.0;
-        public static final double FROZEN_DAMAGE = 1.0;
-
+        public static final double RADIUS              = 90;
+        public static final double VISUAL_DURATION     = 1.5;
+        public static final double DAMAGE_EXPLOSION    = 2.0;
+        public static final double DAMAGE_DIRECT       = 4.0;
+        public static final double FROZEN_DAMAGE       = 1.0;
+        private static final double DAMAGE_TICK_INTERVAL = 0.375;
+        private static final double SLOW_TICK_INTERVAL   = 0.5;
 
         public final double x, y;
         public double timeLeft;
+        private double damageTickTimer = DAMAGE_TICK_INTERVAL;
+        private int    damageTicksLeft = 4;
+        private double slowTickTimer   = SLOW_TICK_INTERVAL;
+        private int    slowTicksLeft   = 3;
 
         public FrozenZone(double x, double y) {
             this.x = x;
@@ -53,6 +54,30 @@ public class FrozenSpell implements Ability {
         public boolean isExpired() { return timeLeft <= 0; }
         /** 剩餘比例：1.0 ~ 0.0，用於透明度動畫 */
         public double getProgress() { return Math.max(0, timeLeft / VISUAL_DURATION); }
+
+        /** 每幀遞減傷害計時器；到時回傳 true 並消耗一次 tick */
+        public boolean tickDamage(double dt) {
+            if (damageTicksLeft <= 0) return false;
+            damageTickTimer -= dt;
+            if (damageTickTimer <= 0) {
+                damageTicksLeft--;
+                damageTickTimer += DAMAGE_TICK_INTERVAL;
+                return true;
+            }
+            return false;
+        }
+
+        /** 每幀遞減緩速計時器；到時回傳 true 並消耗一次 tick */
+        public boolean tickSlow(double dt) {
+            if (slowTicksLeft <= 0) return false;
+            slowTickTimer -= dt;
+            if (slowTickTimer <= 0) {
+                slowTicksLeft--;
+                slowTickTimer += SLOW_TICK_INTERVAL;
+                return true;
+            }
+            return false;
+        }
     }
 
     private static final double FROZEN_INTERVAL    = 1.8;
@@ -124,11 +149,25 @@ public class FrozenSpell implements Ability {
             }
         }
 
-        // 3. 衰減爆炸特效壽命
+        // 3. 衰減爆炸特效壽命，並處理持續傷害與緩速 tick
         Iterator<FrozenZone> zit = zones.iterator();
         while (zit.hasNext()) {
             FrozenZone z = zit.next();
             z.timeLeft -= deltaTime;
+
+            double dx = target.getX() - z.x;
+            double dy = target.getY() - z.y;
+            double r  = FrozenZone.RADIUS + target.getRadius();
+            boolean inZone = dx * dx + dy * dy < r * r;
+
+            if (z.tickDamage(deltaTime) && inZone) {
+                target.takeDamage(FrozenZone.FROZEN_DAMAGE);
+                pendingDamageHits.add(FrozenZone.FROZEN_DAMAGE);
+            }
+            if (z.tickSlow(deltaTime) && inZone) {
+                target.slowDown();
+            }
+
             if (z.isExpired()) zit.remove();
         }
     }
@@ -177,41 +216,7 @@ public class FrozenSpell implements Ability {
             pendingDamageHits.add(damageApplied);
         }
 
-        Timeline FrozenDamageTimeLine = new Timeline(
-                new KeyFrame(Duration.seconds(0.375), e -> {
-
-                    double dx = target.getX() - x;
-                    double dy = target.getY() - y;
-                    double r  = FrozenZone.RADIUS + target.getRadius();
-
-                    if (dx * dx + dy * dy < r * r) {
-                        target.takeDamage(FrozenZone.FROZEN_DAMAGE);
-                        pendingDamageHits.add(FrozenZone.FROZEN_DAMAGE);
-
-                    }
-
-                })
-        );
-
-        FrozenDamageTimeLine.setCycleCount(4);
-        FrozenDamageTimeLine.play();
-
-        Timeline SlowTimeLine = new Timeline(
-                new KeyFrame(Duration.seconds(0.5), e -> {
-
-                    double dx = target.getX() - x;
-                    double dy = target.getY() - y;
-                    double r  = FrozenZone.RADIUS + target.getRadius();
-
-                    if (dx * dx + dy * dy < r * r) {
-                        target.slowDown();
-                    }
-
-                })
-        );
-
-        SlowTimeLine.setCycleCount(3);
-        SlowTimeLine.play();
+        // 持續傷害與緩速 tick 由 FrozenZone 內部狀態驅動，在 update() 中每幀處理
     }
 
         }

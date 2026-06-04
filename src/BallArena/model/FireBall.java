@@ -1,8 +1,6 @@
 package BallArena.model;
 
 import BallArena.ability.FireSpell;
-import javafx.animation.PauseTransition;
-import javafx.util.Duration;
 
 /**
  * 火球：自動鎖定敵方位置、定時發射投射物，

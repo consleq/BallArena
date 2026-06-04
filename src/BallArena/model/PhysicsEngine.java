@@ -236,10 +236,10 @@ public class PhysicsEngine {
                 double aSpeed = Math.sqrt(tempAXspeed * tempAXspeed + tempAYspeed * tempAYspeed);
                 double bSpeed = Math.sqrt(tempBXspeed * tempBXspeed + tempBYspeed * tempBYspeed);
 
-                a.setVx(tempAXspeed / aSpeed * 250);
-                a.setVy(tempAYspeed / aSpeed * 250);
-                b.setVx(tempBXspeed / bSpeed * 250);
-                b.setVy(tempBYspeed / bSpeed * 250);
+                a.setVx(tempAXspeed / aSpeed * a.targetSpeed());
+                a.setVy(tempAYspeed / aSpeed * a.targetSpeed());
+                b.setVx(tempBXspeed / bSpeed * b.targetSpeed());
+                b.setVy(tempBYspeed / bSpeed * b.targetSpeed());
             }
         }
     }

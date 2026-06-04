@@ -1,8 +1,5 @@
 package BallArena.model;
 
-import javafx.animation.PauseTransition;
-import javafx.util.Duration;
-
 /** 所有球種的抽象基底類別（不依賴 JavaFX） */
 public abstract class Ball {
 
@@ -64,23 +61,42 @@ public abstract class Ball {
     }
 
 
-    public void slowDown(){
-//        if (Math.sqrt((vx*vx) + (vy *vy)) < 600){
-            vx = vx*0.5;
-            vy = vy*0.5;
-//        }
-//        else{
-//            vx = vx*0.3;
-//            vy = vy*0.3;
-//        }
+    public static final double SLOW_FACTOR = 0.5;
+    private static final double SLOW_DURATION = 0.5;
+    private double slowTimer = 0;
 
-        PauseTransition delay = new PauseTransition(Duration.seconds(0.5));
+    public boolean isSlowed() { return slowTimer > 0; }
 
-        delay.setOnFinished(e -> {
-                vx = vx*2;
-                vy = vy*2;
-        });
+    /** 目前應有的速度大小（緩速中為基準速度的一半），供撞球後正規化使用 */
+    public double targetSpeed() {
+        return ArenaConfig.BALL_SPEED * (isSlowed() ? SLOW_FACTOR : 1.0);
+    }
 
-        delay.play();
+    /**
+     * 套用緩速：直接把速度大小設為目標速度並重置計時器。
+     * 採絕對設定而非相對折半，避免與撞球時的速度正規化互相干擾、導致還原後速度爆掉。
+     */
+    public void slowDown() {
+        slowTimer = SLOW_DURATION;
+        setSpeed(targetSpeed());
+    }
+
+    /** 每幀由 GameController 呼叫，計時結束後把速度還原為基準速度 */
+    public void tickSlowTimer(double deltaTime) {
+        if (slowTimer > 0) {
+            slowTimer -= deltaTime;
+            if (slowTimer <= 0) {
+                slowTimer = 0;
+                setSpeed(targetSpeed());
+            }
+        }
+    }
+
+    /** 保持方向不變，將速度向量縮放到指定大小 */
+    private void setSpeed(double speed) {
+        double mag = Math.sqrt(vx * vx + vy * vy);
+        if (mag < 1e-9) return;
+        vx = vx / mag * speed;
+        vy = vy / mag * speed;
     }
 }

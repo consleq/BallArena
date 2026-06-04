@@ -129,7 +129,7 @@ public class GameController {
         if (ball2 instanceof LightningBall lb2) lb2.setTarget(ball1);
 
         Random rng = new Random();
-        double speed = 250;
+        double speed = ArenaConfig.BALL_SPEED;
         double angle1 = rng.nextDouble() * Math.PI * 2;
         double angle2 = rng.nextDouble() * Math.PI * 2;
         ball1.setVx(Math.cos(angle1) * speed);
@@ -186,6 +186,8 @@ public class GameController {
         if (ball2 instanceof EngineerBall eb2) physics.checkTurretUpgrade(eb2);
         ball1.updateAbility(deltaTime);
         ball2.updateAbility(deltaTime);
+        ball1.tickSlowTimer(deltaTime);
+        ball2.tickSlowTimer(deltaTime);
 
         physics.updateCooldowns(deltaTime);
         popupRenderer.update(deltaTime);
