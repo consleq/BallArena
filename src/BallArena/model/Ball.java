@@ -33,7 +33,6 @@ public abstract class Ball {
     public double getVx()     { return vx; }
     public double getVy()     { return vy; }
     public double getHp()     { return hp; }
-    public double getMaxHp()  { return maxHp; }
     public double getRadius() { return radius; }
     public BallStyle getStyle() { return style; }
 

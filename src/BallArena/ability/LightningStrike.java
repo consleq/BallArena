@@ -37,7 +37,7 @@ public class LightningStrike implements Ability {
 
     private static final double STRIKE_INTERVAL = 2.0;
     private static final double INITIAL_DELAY   = 1.0;
-    private static final double STRIKE_DAMAGE   = 5.0;
+    private static final double STRIKE_DAMAGE   = 4.0;
     private static final int    SEGMENTS        = 10;   // 鋸齒段數
     private static final double JAGGED_AMP       = 14;  // 鋸齒最大橫向偏移
 
