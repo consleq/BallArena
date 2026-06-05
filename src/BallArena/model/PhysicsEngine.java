@@ -1,6 +1,5 @@
 package BallArena.model;
 
-import BallArena.ability.FireSpell;
 import BallArena.ability.TurretSkill;
 
 /** 負責移動、牆壁反彈、球與球碰撞（純 Java，不依賴 JavaFX） */
@@ -21,17 +20,6 @@ public class PhysicsEngine {
     private double spikeCooldown = 0;
     private double mysteryCooldown = 0;
     private static final double HIT_COOLDOWN = 0.5;
-
-    // 火球範圍傷害：每幀少量扣血、每秒結算一次 popup 顯示
-    private static final double FIRE_POPUP_INTERVAL = 1.0;
-    private double firePopupTimer       = 0;
-    private double fireAccumulatedDmg   = 0;
-
-    // 砲台範圍傷害：每幀扣血，每秒結算一次 popup 顯示
-    private static final double TURRET_POPUP_INTERVAL = 1.0;
-    private double turretPopupTimer     = 0;
-    private double turretAccumulatedDmg = 0;
-
 
 
     public boolean update(Ball ball, double deltaTime) {
@@ -98,8 +86,6 @@ public class PhysicsEngine {
         swordCooldown   = Math.max(0, swordCooldown - deltaTime);
         spikeCooldown   = Math.max(0, spikeCooldown - deltaTime);
         mysteryCooldown = Math.max(0, mysteryCooldown - deltaTime);
-        firePopupTimer += deltaTime;
-        turretPopupTimer += deltaTime;
     }
 
     /**

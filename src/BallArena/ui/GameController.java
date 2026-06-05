@@ -247,16 +247,6 @@ public class GameController {
             for (Double dmg : frob2.getFrozenSpell().drainDamageHits()) {
                 popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
             }
-
-            //工程師球
-        }
-        if (ball1 instanceof EngineerBall eb1) {
-            double dmg = physics.checkTurretBulletHit(eb1, ball2);
-            if (dmg > 0) popupRenderer.addPopup(ball2.getX(), ball2.getY() - ball2.getRadius() - 4, dmg);
-        }
-        if (ball2 instanceof EngineerBall eb2) {
-            double dmg = physics.checkTurretBulletHit(eb2, ball1);
-            if (dmg > 0) popupRenderer.addPopup(ball1.getX(), ball1.getY() - ball1.getRadius() - 4, dmg);
         }
 
         // 吸血球：扣血由 VampireAbility 自己處理
