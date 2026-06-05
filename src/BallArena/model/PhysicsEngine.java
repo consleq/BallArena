@@ -45,13 +45,13 @@ public class PhysicsEngine {
         double r = ball.getRadius();
 
         // 左右牆反彈
-        if (ball.getX() - r < 0) {
-            ball.setX(r);
-            ball.setVx(Math.abs(ball.getVx()));
+        if (ball.getX() - r < 0) { // hit left wall
+            ball.setX(r); // 把球推回牆內（讓左緣剛好貼牆）
+            ball.setVx(Math.abs(ball.getVx())); // 速度改成正值 → 強制往右走
             hitV = true;
-        } else if (ball.getX() + r > ArenaConfig.WIDTH) {
-            ball.setX(ArenaConfig.WIDTH - r);
-            ball.setVx(-Math.abs(ball.getVx()));
+        } else if (ball.getX() + r > ArenaConfig.WIDTH) { // hit right wall
+            ball.setX(ArenaConfig.WIDTH - r); // 把球推回牆內（讓右緣剛好貼牆）
+            ball.setVx(-Math.abs(ball.getVx())); // 速度改成負值 → 強制往左走
             hitV = true;
         }
 
