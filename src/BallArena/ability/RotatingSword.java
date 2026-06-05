@@ -30,7 +30,7 @@ public class RotatingSword implements Ability {
 
     @Override
     public void onBounce() {
-        // 目前碰牆不影響劍，預留給未來功能
+
     }
 
     /** 劍的起點 X（球心往外 SWORD_DISTANCE） */
